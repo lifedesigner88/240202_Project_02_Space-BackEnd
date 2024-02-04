@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -24,7 +26,7 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine springTemplateEngine;
-
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -36,7 +38,7 @@ public class EmailService {
         return springTemplateEngine.process("email", context);     // email.html
     }
 
-    public void SendEmail(String email, String title, String content) throws MessagingException  {
+    public void SendEmail(String email, String title, String content) throws MessagingException, UnsupportedEncodingException {
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper mailHelper = new MimeMessageHelper(message,true,"UTF-8");
@@ -47,13 +49,24 @@ public class EmailService {
         javaMailSender.send(message);
 
     }
-    public String makeRandomNumber(String email ) throws NoSuchAlgorithmException {
-        Random random = SecureRandom.getInstanceStrong();
+    public String makeRandomCode(String email ) throws NoSuchAlgorithmException {
+        Random BooleanRandom = new Random();
+        Random random = new Random();
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
-            builder.append(random.nextInt(10));
+        for(int i=0;i<8;i++) {
+            if(BooleanRandom.nextBoolean()){
+                builder.append((char)((int)(random.nextInt(26))+97));
+            }else{
+                builder.append((random.nextInt(10)));
+            }
         }
+        redisTemplate.opsForValue().set(email, builder.toString(), 10, TimeUnit.MINUTES);
         return builder.toString();
+    }
+
+    public boolean VerificationCode(String email, String code) {
+        String Code = redisTemplate.opsForValue().get(email);
+        return Code != null && Code.equals(code);
     }
 
 }
