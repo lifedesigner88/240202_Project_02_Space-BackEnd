@@ -1,24 +1,20 @@
-package com.encore.space.common.Service;
+package com.encore.space.common.service;
 
-import io.swagger.models.properties.EmailProperty;
-import io.swagger.models.properties.StringProperty;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.mail.MailMessage;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -50,6 +46,14 @@ public class EmailService {
         mailHelper.setText(setContext(content), true);
         javaMailSender.send(message);
 
+    }
+    public String makeRandomNumber(String email ) throws NoSuchAlgorithmException {
+        Random random = SecureRandom.getInstanceStrong();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            builder.append(random.nextInt(10));
+        }
+        return builder.toString();
     }
 
 }
