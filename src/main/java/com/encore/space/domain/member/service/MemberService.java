@@ -60,8 +60,11 @@ public class MemberService {
     }
 
     public String emailAuthentication(String email) throws MessagingException, NoSuchAlgorithmException, UnsupportedEncodingException {
+        if(!emailService.isValidEmail(email)){
+            throw new IllegalArgumentException("이메일 형식을 확인해 주세요.");
+        }
+
         String number = emailService.makeRandomCode(email);
-        log.info("email : "+ email);
         emailService.SendEmail(
                 email,
         "엔코아 스페이스에서 이메일 인증입니다.",

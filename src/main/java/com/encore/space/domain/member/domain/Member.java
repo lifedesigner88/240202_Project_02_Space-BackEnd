@@ -38,4 +38,6 @@ public class Member extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private LoginType loginType;
 
+    private String profile;
+
 }

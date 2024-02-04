@@ -4,6 +4,7 @@ import com.encore.space.common.CommonResponse;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
 import com.encore.space.domain.member.service.MemberService;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class MemberController {
     }
 
     @PostMapping("/create")
-    private ResponseEntity<CommonResponse> memberCreate(@RequestBody MemberReqDto memberReqDto){
+    private ResponseEntity<CommonResponse> memberCreate(@RequestBody @Valid MemberReqDto memberReqDto){
         return CommonResponse.responseMassage(
                 HttpStatus.CREATED,
                 "회원가입 성공",
