@@ -40,4 +40,7 @@ public class Member extends BaseEntity {
 
     private String profile;
 
+    @Builder.Default
+    private String delYn = "N";
+
 }

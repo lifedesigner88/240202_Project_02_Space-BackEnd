@@ -1,6 +1,7 @@
 package com.encore.space.common.config;
 
 import com.encore.space.common.JwtAuthFilter;
+import com.encore.space.common.service.Oauth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +23,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final Oauth2UserService oauth2UserService;
 
     @Autowired
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(
+            JwtAuthFilter jwtAuthFilter,
+            Oauth2UserService oauth2UserService
+    ) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.oauth2UserService = oauth2UserService;
     }
 
 
@@ -52,7 +58,8 @@ public class SecurityConfig {
 
                                         "/api/doLogin",
                                         "/api/login",
-                                        "/login"
+                                        "/login/",
+                                        "/oauth2/**"
                                         )
                                 .permitAll()
 
@@ -75,6 +82,13 @@ public class SecurityConfig {
                 )
 
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+                                .userService(oauth2UserService)
+                        )
+                )
+
 
                 .build();
     }

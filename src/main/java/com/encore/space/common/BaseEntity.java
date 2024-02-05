@@ -1,6 +1,8 @@
 package com.encore.space.common;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 import java.time.LocalDateTime;
+
 
 @Getter
 @MappedSuperclass
@@ -22,4 +25,5 @@ public abstract class BaseEntity {
 
     @UpdateTimestamp
     private LocalDateTime updated_at;
+
 }

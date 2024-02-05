@@ -31,6 +31,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     .nickname("설현매니저")
                     .password(passwordEncoder.encode("88959697"))
                     .role(Role.MANAGER)
+                    .delYn("N")
                     .build();
             memberRepository.save(adminMember);
         }
