@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Encore</title>
 </head>
 <body>
-<p> 매인 홈 화면 </p>
+<p> 임시 테스트 위한 공간 </p>
 
-<button class="btn btn-success active" th:onclick="|location.href='@{/login}'|" type="button">Login</button>
+<button class="btn btn-success active" th:onclick="|location.href='@{/swagger-ui/index.html}'|" type="button">Swagger</button>
+<button class="btn btn-success active" th:onclick="|location.href='@{/oauth2/authorization/google}'|" type="button">Google Login</button>
+<button class="btn btn-success active" th:onclick="|location.href='@{/oauth2/authorization/github}'|" type="button">Github Login</button>
+
+
 
 </body>
 </html>

@@ -1,6 +1,6 @@
 package com.encore.space.domain.member.service;
 
-import com.encore.space.common.ChangeType;
+import com.encore.space.common.domain.ChangeType;
 import com.encore.space.common.service.*;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
@@ -11,7 +11,10 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -45,16 +48,18 @@ public class MemberService {
         return memberRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("존재하지 않는 이메일 입니다."));
     }
 
+    public boolean DuplicatedEmail(String email){
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
     public MemberResDto memberCreate(MemberReqDto memberReqDto) throws DataIntegrityViolationException {
-        if(memberRepository.findByEmail(memberReqDto.getEmail()).isPresent()){
-            throw new DataIntegrityViolationException("중복 이메일 입니다.");
+        if(this.DuplicatedEmail(memberReqDto.getEmail())){
+            throw new DataIntegrityViolationException("이미 가입된 이메일입니다. 다른 이메일을 이용하세요.");
         }
 
         return changeType.memberTOmemberResDto(
                 memberRepository.save(
-                        changeType.memberReqDtoTOmember(
-                                memberReqDto
-                        )
+                        changeType.memberReqDtoTOmember(memberReqDto)
                 )
         );
     }

@@ -1,4 +1,4 @@
-package com.encore.space.common;
+package com.encore.space.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

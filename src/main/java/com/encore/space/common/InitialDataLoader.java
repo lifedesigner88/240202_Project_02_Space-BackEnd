@@ -24,16 +24,27 @@ public class InitialDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if(memberRepository.findByEmail("encorespace3@gmail.com").isEmpty()){
-            Member adminMember = Member.builder()
+        if(memberRepository.findByEmail("encorespace@gmail.com").isEmpty()){
+            Member member = Member.builder()
                     .name("SpaceManager")
-                    .email("encorespace3@gmail.com")
+                    .email("encorespace@gmail.com")
                     .nickname("설현매니저")
-                    .password(passwordEncoder.encode("88959697"))
+                    .password(passwordEncoder.encode("123456789"))
                     .role(Role.MANAGER)
                     .delYn("N")
                     .build();
-            memberRepository.save(adminMember);
+            memberRepository.save(member);
+        }
+        if(memberRepository.findByEmail("ksg3941234@gmail.com").isEmpty()){
+            Member member = Member.builder()
+                    .name("SpaceTeacher")
+                    .email("ksg3941234@gmail.com")
+                    .nickname("김선국 강사님")
+                    .password(passwordEncoder.encode("123456789"))
+                    .role(Role.TEACHER)
+                    .delYn("N")
+                    .build();
+            memberRepository.save(member);
         }
     }
 }

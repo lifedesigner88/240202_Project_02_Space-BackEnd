@@ -1,6 +1,5 @@
-package com.encore.space.common;
+package com.encore.space.common.response;
 
-import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
 import com.encore.space.domain.member.dto.resdto.MemberResDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

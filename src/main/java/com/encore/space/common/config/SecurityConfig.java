@@ -1,14 +1,12 @@
 package com.encore.space.common.config;
 
-import com.encore.space.common.JwtAuthFilter;
-import com.encore.space.common.service.Oauth2UserService;
+import com.encore.space.common.jwt.JwtAuthFilter;
+import com.encore.space.common.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,15 +21,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final Oauth2UserService oauth2UserService;
+    private final LoginService loginService;
 
     @Autowired
     public SecurityConfig(
             JwtAuthFilter jwtAuthFilter,
-            Oauth2UserService oauth2UserService
+            LoginService loginService
     ) {
         this.jwtAuthFilter = jwtAuthFilter;
-        this.oauth2UserService = oauth2UserService;
+        this.loginService = loginService;
     }
 
     @Bean
@@ -65,7 +63,7 @@ public class SecurityConfig {
 
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
-                                .userService(oauth2UserService)
+                                .userService(loginService)
                         )
                 )
                 .build();

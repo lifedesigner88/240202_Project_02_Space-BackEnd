@@ -1,6 +1,6 @@
 package com.encore.space.domain.member.controller;
 
-import com.encore.space.common.CommonResponse;
+import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
 import com.encore.space.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ public class MemberController {
     ) {
         this.memberService = memberService;
     }
-    @Operation(summary = "회원 가입", description = "신규 회원 생성")
+    @Operation(summary = "이메일 회원 가입", description = "신규 회원 생성")
     @PostMapping("/create")
     private ResponseEntity<CommonResponse> memberCreate(@RequestBody @Valid MemberReqDto memberReqDto){
         return CommonResponse.responseMassage(

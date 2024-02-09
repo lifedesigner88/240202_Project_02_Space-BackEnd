@@ -1,4 +1,4 @@
-package com.encore.space.common;
+package com.encore.space.common.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
 package com.encore.space.domain.member.domain;
 
-import com.encore.space.common.BaseEntity;
+import com.encore.space.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,6 @@ public class Member extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)

@@ -1,5 +1,6 @@
-package com.encore.space.common;
+package com.encore.space.common.jwt;
 
+import com.encore.space.common.response.CommonResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

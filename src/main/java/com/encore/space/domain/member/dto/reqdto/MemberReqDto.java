@@ -32,6 +32,8 @@ public class MemberReqDto {
     @NotBlank(message = "닉네임을 입력해주세요.")
     private String nickname;
 
+    private String profile;
+
     @NotNull
     @Schema(description = "로그인 타입")
     private LoginType loginType;
