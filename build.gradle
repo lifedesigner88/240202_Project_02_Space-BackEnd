@@ -31,13 +31,29 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // 스웨거
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-    implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
     // email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // 시큐리티
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // 검사
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // JWT 관련 토큰
+    implementation "io.jsonwebtoken:jjwt-api:0.11.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.11.5"
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'redis.clients:jedis'
+
+    // oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 }
 
 tasks.named('test') {
