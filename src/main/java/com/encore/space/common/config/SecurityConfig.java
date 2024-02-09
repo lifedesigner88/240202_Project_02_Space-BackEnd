@@ -34,7 +34,6 @@ public class SecurityConfig {
         this.oauth2UserService = oauth2UserService;
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder(){
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -43,35 +42,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)   //  6.* 부터는 csrf() 이 사라진다.
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(CorsConfig.corsConfigurationSource()))
                 .httpBasic(AbstractHttpConfigurer::disable)
-                // 접속 URL 설정
                 .authorizeHttpRequests(authorizeRequest ->
                         authorizeRequest
-                                // 플어줄 것
-                                .requestMatchers(
-                                        "/",
-                                        "/api/member/create",
-                                        "/api/member/emailAuthentication",
-                                        "/api/member/emailCheck",
-
-                                        "/api/doLogin",
-                                        "/api/login",
-                                        "/login/",
-                                        "/oauth2/**"
-                                        )
-                                .permitAll()
-
-                                // 메니저 권한
-                                .requestMatchers(
-                                        "/swagger-resources/**",
-                                        "/swagger-ui.html",
-                                        "/v2/api-docs",
-                                        "/webjars/**"
-                                )
-                                .hasAnyRole("MANAGER")
-
+                                .requestMatchers("/" ).permitAll()
+                                .requestMatchers(SwaggerUrl).permitAll()
+                                .requestMatchers(MemberApiUrl).permitAll()
+                                .requestMatchers(LoginApiUrl).permitAll()
+                                .requestMatchers(ManagerApiUrl).hasAnyRole("MANAGER")
                                 .anyRequest()
                                     .authenticated()
 
@@ -88,9 +68,30 @@ public class SecurityConfig {
                                 .userService(oauth2UserService)
                         )
                 )
-
-
                 .build();
     }
+
+    private static final String[] SwaggerUrl = {
+            "/api/vi/auth/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml"
+    };
+
+    private static final String[] MemberApiUrl = {
+            "/api/member/create",
+            "/api/member/emailAuthentication",
+            "/api/member/emailCheck",
+    };
+
+    private static final String[] LoginApiUrl = {
+            "/oauth2/**",
+            "/login",
+    };
+
+    private static final String[] ManagerApiUrl = {
+            "/manager/**",
+    };
 
 }
