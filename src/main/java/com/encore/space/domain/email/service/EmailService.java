@@ -1,9 +1,10 @@
-package com.encore.space.common.service;
+package com.encore.space.domain.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -21,12 +22,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine springTemplateEngine;
     private final RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    public EmailService(
+            JavaMailSender javaMailSender,
+            SpringTemplateEngine springTemplateEngine,
+            RedisTemplate<String, String> redisTemplate
+    ){
+        this.javaMailSender = javaMailSender;
+        this.springTemplateEngine = springTemplateEngine;
+        this.redisTemplate = redisTemplate;
+    }
 
     @Value("${spring.mail.username}")
     private String fromEmail;

@@ -1,15 +1,22 @@
 package com.encore.space.common.config;
 
-import com.encore.space.common.jwt.JwtAuthFilter;
-import com.encore.space.common.service.LoginService;
+import com.encore.space.domain.login.jwt.JwtAuthFilter;
+import com.encore.space.domain.login.handler.LoginFailureHandler;
+import com.encore.space.domain.login.handler.LoginSuccessHandler;
+import com.encore.space.domain.login.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,14 +29,22 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final LoginService loginService;
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
+
+
 
     @Autowired
     public SecurityConfig(
             JwtAuthFilter jwtAuthFilter,
-            LoginService loginService
+            LoginService loginService,
+            LoginSuccessHandler loginSuccessHandler,
+            LoginFailureHandler loginFailureHandler
     ) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.loginService = loginService;
+        this.loginSuccessHandler = loginSuccessHandler;
+        this.loginFailureHandler = loginFailureHandler;
     }
 
     @Bean
@@ -51,7 +66,7 @@ public class SecurityConfig {
                                 .requestMatchers(LoginApiUrl).permitAll()
                                 .requestMatchers(ManagerApiUrl).hasAnyRole("MANAGER")
                                 .anyRequest()
-                                    .authenticated()
+                                .authenticated()
 
                 )
 
@@ -65,7 +80,10 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(loginService)
                         )
+                        .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
                 )
+
                 .build();
     }
 
@@ -78,18 +96,21 @@ public class SecurityConfig {
     };
 
     private static final String[] MemberApiUrl = {
+            "/api/member/doLogin",
             "/api/member/create",
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",
     };
 
     private static final String[] LoginApiUrl = {
+
             "/oauth2/**",
             "/login",
     };
 
     private static final String[] ManagerApiUrl = {
             "/manager/**",
+            "/api/member/qwe",
     };
 
 }

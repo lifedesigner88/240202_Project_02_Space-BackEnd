@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Arrays;
 
 @Slf4j
 @RestControllerAdvice
@@ -38,6 +41,10 @@ public class ExceptionResponse {
             return CommonResponse.responseMassage(HttpStatus.CONFLICT, e.getMessage());
         }
 
+        if(e instanceof UsernameNotFoundException){
+            return CommonResponse.responseMassage(HttpStatus.FORBIDDEN , e.getMessage());
+        }
+        log.error(Arrays.toString(e.getStackTrace()));
 
         return CommonResponse.responseMassage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }

@@ -1,4 +1,4 @@
-package com.encore.space.common.jwt;
+package com.encore.space.domain.login.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,10 +20,10 @@ public class JwtProvider {
     @Value("${jwt.time}")
     int time;
 
-
-    public String createToken(String email, String role){
+    public String createToken(String email, Long id ,String role){
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role",role);
+        claims.put("userId", id);
         Date now = new Date();
 
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -35,4 +35,5 @@ public class JwtProvider {
                 .signWith( key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 }
