@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -96,12 +97,7 @@ public class MemberController {
     )
     @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/qwe")
-    public String qwe(){
-        // 현재 사용자의 인증 객체 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // 인증 객체에서 UserDetails 가져오기
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
         return "ok" + userDetails.getUsername() + " "+ userDetails.getUserId() ;
     }
 }

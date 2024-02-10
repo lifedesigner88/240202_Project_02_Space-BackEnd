@@ -1,15 +1,20 @@
 package com.encore.space.common.response;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.security.SignatureException;
 import java.util.Arrays;
 
 @Slf4j
@@ -44,6 +49,15 @@ public class ExceptionResponse {
         if(e instanceof UsernameNotFoundException){
             return CommonResponse.responseMassage(HttpStatus.FORBIDDEN , e.getMessage());
         }
+
+        if(e instanceof AuthenticationException){
+            return CommonResponse.responseMassage(HttpStatus.UNAUTHORIZED , e.getMessage());
+        }
+
+        if(e instanceof AccessDeniedException){
+            return CommonResponse.responseMassage(HttpStatus.UNAUTHORIZED , e.getMessage());
+        }
+
         log.error(Arrays.toString(e.getStackTrace()));
 
         return CommonResponse.responseMassage(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

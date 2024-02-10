@@ -1,5 +1,6 @@
 package com.encore.space.domain.login.domain;
 
+import com.encore.space.domain.member.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final Long userId;
+    private final String role;
     @Builder.Default
     private final boolean accountNonExpired = true;
     @Builder.Default

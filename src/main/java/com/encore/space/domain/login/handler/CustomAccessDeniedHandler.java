@@ -8,33 +8,31 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @Component
-public class LoginFailureHandler implements AuthenticationFailureHandler {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public LoginFailureHandler(ObjectMapper objectMapper) {
+    CustomAccessDeniedHandler(ObjectMapper objectMapper){
         this.objectMapper = objectMapper;
     }
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         objectMapper.writeValue(
                 response.getWriter(),
                 CommonResponse.builder()
-                        .httpStatus(HttpStatus.UNAUTHORIZED)
-                        .message("로그인에 실패했습니다.")
-                        .result(exception.getMessage())
+                        .httpStatus(HttpStatus.FORBIDDEN)
+                        .message("권한이 없습니다")
                         .build()
         );
     }
