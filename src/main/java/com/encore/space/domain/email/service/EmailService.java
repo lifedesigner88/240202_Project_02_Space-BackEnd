@@ -71,12 +71,12 @@ public class EmailService {
                 builder.append((random.nextInt(10)));
             }
         }
-        redisTemplate.opsForValue().set(email, builder.toString(), 10, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(email+"_emailCheck", builder.toString(), 10, TimeUnit.MINUTES);
         return builder.toString();
     }
 
     public boolean VerificationCode(String email, String code) {
-        String Code = redisTemplate.opsForValue().get(email);
+        String Code = redisTemplate.opsForValue().get(email+"_emailCheck");
         return Code != null && Code.equals(code);
     }
 

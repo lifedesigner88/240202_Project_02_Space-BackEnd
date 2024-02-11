@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -122,15 +124,6 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
             throw new UsernameNotFoundException("비밀번호가 틀렸습니다.");
         }
 
-        String jwt = jwtProvider.createToken(
-                member.getEmail(),
-                member.getId() ,
-                member.getRole().toString()
-        );
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", member.getId());
-        map.put("token", jwt);
-        return map;
+        return jwtProvider.exportToken(member.getEmail(), member.getId(), member.getRole().toString());
     }
 }
