@@ -1,15 +1,26 @@
 package com.encore.space.common.config;
 
-import com.encore.space.common.jwt.JwtAuthFilter;
-import com.encore.space.common.service.LoginService;
+import com.encore.space.domain.login.handler.CustomAccessDeniedHandler;
+import com.encore.space.domain.login.handler.CustomAuthenticationEntryPointHandler;
+import com.encore.space.domain.login.jwt.JwtAuthFilter;
+import com.encore.space.domain.login.handler.LoginFailureHandler;
+import com.encore.space.domain.login.handler.LoginSuccessHandler;
+import com.encore.space.domain.login.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,14 +33,28 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final LoginService loginService;
+    private final LoginSuccessHandler loginSuccessHandler;
+    private final LoginFailureHandler loginFailureHandler;
+    private final CustomAuthenticationEntryPointHandler customAuthenticationEntryPointHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+
 
     @Autowired
     public SecurityConfig(
             JwtAuthFilter jwtAuthFilter,
-            LoginService loginService
+            LoginService loginService,
+            LoginSuccessHandler loginSuccessHandler,
+            LoginFailureHandler loginFailureHandler,
+            CustomAuthenticationEntryPointHandler customAuthenticationEntryPointHandler,
+            CustomAccessDeniedHandler customAccessDeniedHandler
     ) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.loginService = loginService;
+        this.loginSuccessHandler = loginSuccessHandler;
+        this.loginFailureHandler = loginFailureHandler;
+        this.customAuthenticationEntryPointHandler = customAuthenticationEntryPointHandler;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -42,6 +67,7 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(CorsConfig.corsConfigurationSource()))
+                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequest ->
                         authorizeRequest
@@ -51,7 +77,7 @@ public class SecurityConfig {
                                 .requestMatchers(LoginApiUrl).permitAll()
                                 .requestMatchers(ManagerApiUrl).hasAnyRole("MANAGER")
                                 .anyRequest()
-                                    .authenticated()
+                                .authenticated()
 
                 )
 
@@ -65,7 +91,15 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(loginService)
                         )
+                        .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
                 )
+
+                .exceptionHandling( (exceptionHandling) -> {
+                    exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPointHandler);
+                    exceptionHandling.accessDeniedHandler(customAccessDeniedHandler);
+                })
+
                 .build();
     }
 
@@ -78,12 +112,17 @@ public class SecurityConfig {
     };
 
     private static final String[] MemberApiUrl = {
+            "/api/member/doLogin",
             "/api/member/create",
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",
+
+            // 테스트용
+            "/api/member/qwe",
     };
 
     private static final String[] LoginApiUrl = {
+
             "/oauth2/**",
             "/login",
     };

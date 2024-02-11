@@ -1,4 +1,4 @@
-package com.encore.space.common.oauth;
+package com.encore.space.domain.login.domain;
 
 import com.encore.space.domain.member.domain.LoginType;
 import com.fasterxml.jackson.core.type.TypeReference;

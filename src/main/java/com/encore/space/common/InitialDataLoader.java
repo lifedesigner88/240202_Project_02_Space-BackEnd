@@ -29,7 +29,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     .name("SpaceManager")
                     .email("encorespace@gmail.com")
                     .nickname("설현매니저")
-                    .password(passwordEncoder.encode("123456789"))
+                    .password(passwordEncoder.encode("e123456789"))
                     .role(Role.MANAGER)
                     .delYn("N")
                     .build();
@@ -40,7 +40,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     .name("SpaceTeacher")
                     .email("ksg3941234@gmail.com")
                     .nickname("김선국 강사님")
-                    .password(passwordEncoder.encode("123456789"))
+                    .password(passwordEncoder.encode("e123456789"))
                     .role(Role.TEACHER)
                     .delYn("N")
                     .build();
