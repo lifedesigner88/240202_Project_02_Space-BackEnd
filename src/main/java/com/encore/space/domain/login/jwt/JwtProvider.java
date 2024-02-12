@@ -111,7 +111,7 @@ public class JwtProvider {
                 email, id, role
         );
 
-        redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.DAYS);
 
         Map<String, Object> map = new HashMap<>();
         map.put("accessToken", accessToken);

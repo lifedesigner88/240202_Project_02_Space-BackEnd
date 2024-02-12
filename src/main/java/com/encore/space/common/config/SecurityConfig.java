@@ -112,7 +112,7 @@ public class SecurityConfig {
     };
 
     private static final String[] MemberApiUrl = {
-            "/api/member/doLogin",
+            "/api/member/login",
             "/api/member/create",
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",
