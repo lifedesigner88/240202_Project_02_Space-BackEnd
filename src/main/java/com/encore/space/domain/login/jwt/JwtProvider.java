@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -33,6 +34,9 @@ public class JwtProvider {
 
     @Value("${jwt.refreshTokenTime}")
     int refreshTokenTime;
+
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
 
     private final RedisTemplate<String,String> redisTemplate;
 
@@ -107,10 +111,23 @@ public class JwtProvider {
                 email, id, role
         );
 
-        redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.MINUTES);
 
         Map<String, Object> map = new HashMap<>();
         map.put("accessToken", accessToken);
+        return  map;
+    }
+
+    public Map<String, Object> reExportToken(String email, Long id , String role, String accessToken, String refreshToken){
+        String newAccessToken = this.createAccessToken(
+                email, id, role
+        );
+        Jedis jedis = new Jedis(redisHost, 6379);
+        long ttl = jedis.ttl(accessToken);
+        redisTemplate.opsForValue().set(newAccessToken, refreshToken, ttl, TimeUnit.SECONDS);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("accessToken", newAccessToken);
         return  map;
     }
 }

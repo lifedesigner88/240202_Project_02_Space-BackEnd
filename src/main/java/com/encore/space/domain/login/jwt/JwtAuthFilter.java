@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SignatureException;
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -92,10 +93,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 if(refreshToken != null){
                     Claims claims = jwtProvider.validateRefreshToken(refreshToken);
                     errorMessage = "토큰을 재발행 합니다.";
-                    errorException = jwtProvider.exportToken(
+                    errorException = jwtProvider.reExportToken(
                             claims.getSubject(),
                             ((Integer) claims.get("userId")).longValue(),
-                            claims.get("role").toString()
+                            claims.get("role").toString(),
+                            token,
+                            refreshToken
                     );
                 }else{
                     errorException = "로그인 만료";
