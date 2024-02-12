@@ -1,7 +1,6 @@
 package com.encore.space.domain.login.service;
 
 import com.encore.space.common.config.PasswordConfig;
-import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.login.domain.GitHubMember;
 import com.encore.space.domain.login.domain.GoogleMember;
 import com.encore.space.domain.login.domain.MemberInfo;
@@ -10,16 +9,13 @@ import com.encore.space.domain.login.jwt.JwtProvider;
 import com.encore.space.domain.member.domain.LoginType;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
-import com.encore.space.domain.member.repository.MemberRepository;
 import com.encore.space.domain.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -31,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -42,16 +37,19 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
 
     // 시큐리티에 있는 것을 가져다 쓰면 순환 참조가 걸림 조심.
     private final PasswordConfig passwordConfig;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     public LoginService(
             MemberService memberService,
             JwtProvider jwtProvider,
-            PasswordConfig passwordConfig
+            PasswordConfig passwordConfig,
+            RedisTemplate<String, String> redisTemplate
     ) {
         this.memberService = memberService;
         this.jwtProvider = jwtProvider;
         this.passwordConfig = passwordConfig;
+        this.redisTemplate = redisTemplate;
     }
 
     /*
@@ -125,5 +123,9 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         }
 
         return jwtProvider.exportToken(member.getEmail(), member.getId(), member.getRole().toString());
+    }
+
+    public void logout(HttpServletRequest request) {
+        redisTemplate.delete(jwtProvider.extractAccessToken(request));
     }
 }
