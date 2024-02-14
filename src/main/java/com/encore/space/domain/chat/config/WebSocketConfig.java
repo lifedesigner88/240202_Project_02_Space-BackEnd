@@ -25,16 +25,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     /**
      * WebSocket 통신을 위한 STOMP 엔드포인트를 등록한다.
-     * STOMP 웹소켓의 연결 엔드포인트는 /ws-stomp이다.
-     * 웹소켓 통신이 /ws-stomp로 도착할 때 우리는 해당 통신이 웹 소켓 통신 중에서 STOMP 통신인 것을 확인하고, 이를 연결한다.
+     * STOMP 웹소켓의 연결 엔드포인트는 /stomp/chat이다.
+     * 웹소켓 통신이 /stomp/chat로 도착할 때 우리는 해당 통신이 웹 소켓 통신 중에서 STOMP 통신인 것을 확인하고, 이를 연결한다.
      *
      * @param registry 엔드포인트를 등록하는 데 사용되는 StompEndpointRegistry 객체
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-stomp")
-//                .setAllowedOrigins("*")
-                .setAllowedOriginPatterns("*")
+        registry.addEndpoint("/stomp/chat")
+                .setAllowedOriginPatterns("http://localhost:8080", "http://localhost:8081")
                 .withSockJS();
     }
 }
