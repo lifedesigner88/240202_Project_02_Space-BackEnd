@@ -1,6 +1,7 @@
 package com.encore.space.domain.login.service;
 
 import com.encore.space.common.config.PasswordConfig;
+import com.encore.space.common.config.WebConfig;
 import com.encore.space.domain.login.domain.GitHubMember;
 import com.encore.space.domain.login.domain.GoogleMember;
 import com.encore.space.domain.login.domain.MemberInfo;
@@ -23,6 +24,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,18 +41,21 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
     // 시큐리티에 있는 것을 가져다 쓰면 순환 참조가 걸림 조심.
     private final PasswordConfig passwordConfig;
     private final RedisTemplate<String, String> redisTemplate;
+    private final WebConfig webConfig;
 
     @Autowired
     public LoginService(
             MemberService memberService,
             JwtProvider jwtProvider,
             PasswordConfig passwordConfig,
-            RedisTemplate<String, String> redisTemplate
+            RedisTemplate<String, String> redisTemplate,
+            WebConfig webConfig
     ) {
         this.memberService = memberService;
         this.jwtProvider = jwtProvider;
         this.passwordConfig = passwordConfig;
         this.redisTemplate = redisTemplate;
+        this.webConfig = webConfig;
     }
 
     /*
@@ -94,7 +100,6 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
         attributes.put("role", member.getRole());
         attributes.put("email", member.getEmail());
-        attributes.put("userid", member.getId());
 
 
         return new DefaultOAuth2User(
@@ -122,7 +127,9 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
             throw new UsernameNotFoundException("비밀번호가 틀렸습니다.");
         }
 
-        return jwtProvider.exportToken(member.getEmail(), member.getId(), member.getRole().toString());
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        log.info(webConfig.ipCheck(request));
+        return jwtProvider.exportToken(member.getEmail(), member.getRole().toString(), webConfig.ipCheck(request));
     }
 
     public void logout(HttpServletRequest request) {
