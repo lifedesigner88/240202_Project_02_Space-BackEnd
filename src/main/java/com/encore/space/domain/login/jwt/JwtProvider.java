@@ -109,7 +109,6 @@ public class JwtProvider {
         String refreshToken = this.createRefreshToken(
                 email, role, clientIP
         );
-        log.info("refreshToken : "+refreshToken);
         redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.DAYS);
 
         Map<String, Object> map = new HashMap<>();

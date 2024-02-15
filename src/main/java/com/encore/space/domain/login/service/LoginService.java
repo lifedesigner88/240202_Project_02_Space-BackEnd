@@ -128,7 +128,6 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         }
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        log.info(webConfig.ipCheck(request));
         return jwtProvider.exportToken(member.getEmail(), member.getRole().toString(), webConfig.ipCheck(request));
     }
 

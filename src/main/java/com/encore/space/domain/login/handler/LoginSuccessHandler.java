@@ -49,7 +49,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setCharacterEncoding("UTF-8");
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-        log.info(webConfig.ipCheck(request));
         objectMapper.writeValue(
                 response.getWriter(),
                 CommonResponse.builder()
