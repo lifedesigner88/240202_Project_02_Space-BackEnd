@@ -110,6 +110,6 @@ public class MemberController {
     @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/qwe")
     public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
-        return "ok" + userDetails.getUsername() + " "+ userDetails.getUserId() ;
+        return "ok" + userDetails.getUsername() ;
     }
 }
