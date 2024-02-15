@@ -12,6 +12,7 @@ import com.encore.space.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,10 +87,21 @@ public class MemberController {
             summary = "일반 로그인",
             description = "이메일과 패스워드를 받아 로그인"
     )
-    @PostMapping("/doLogin")
+    @PostMapping("/login")
     public ResponseEntity<CommonResponse> emailLogin(@RequestBody @Valid LoginReqDto loginReqDto) {
         return CommonResponse.responseMassage(HttpStatus.OK, "로그인 되었습니다.", loginService.login(loginReqDto, LoginType.EMAIL));
     }
+
+    @Operation(
+            summary = "로그아웃",
+            description = "AccessToken 을 입력받아 로그아웃"
+    )
+    @GetMapping("/logout")
+    public ResponseEntity<CommonResponse> logout(HttpServletRequest request) {
+        loginService.logout(request);
+        return CommonResponse.responseMassage(HttpStatus.OK, "로그아웃 되었습니다.");
+    }
+
 
     @Operation(
             summary = "일반 로그인 test",
@@ -98,6 +110,6 @@ public class MemberController {
     @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/qwe")
     public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
-        return "ok" + userDetails.getUsername() + " "+ userDetails.getUserId() ;
+        return "ok" + userDetails.getUsername() ;
     }
 }

@@ -1,5 +1,6 @@
 package com.encore.space.domain.login.handler;
 
+import com.encore.space.common.config.WebConfig;
 import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.login.jwt.JwtProvider;
 import com.encore.space.domain.login.service.LoginService;
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -22,19 +24,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
+    private final WebConfig webConfig;
 
     @Autowired
     public LoginSuccessHandler(
             ObjectMapper objectMapper,
-            JwtProvider jwtProvider
+            JwtProvider jwtProvider,
+            WebConfig webConfig
     ) {
         this.objectMapper = objectMapper;
         this.jwtProvider = jwtProvider;
+        this.webConfig = webConfig;
     }
 
     @Override
@@ -43,7 +49,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setCharacterEncoding("UTF-8");
 
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-
         objectMapper.writeValue(
                 response.getWriter(),
                 CommonResponse.builder()
@@ -52,8 +57,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
                         .result(
                                 jwtProvider.exportToken(
                                         oauth2User.getAttribute("email"),
-                                        oauth2User.getAttribute("userid"),
-                                         Objects.requireNonNull(oauth2User.getAttribute("role")).toString()
+                                        Objects.requireNonNull(oauth2User.getAttribute("role")).toString(),
+                                        webConfig.ipCheck(request)
                                 )
                         )
                         .build()

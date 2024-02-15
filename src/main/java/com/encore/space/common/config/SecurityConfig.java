@@ -1,26 +1,19 @@
 package com.encore.space.common.config;
 
-import com.encore.space.domain.login.handler.CustomAccessDeniedHandler;
-import com.encore.space.domain.login.handler.CustomAuthenticationEntryPointHandler;
+import com.encore.space.common.handler.CustomAccessDeniedHandler;
+import com.encore.space.common.handler.CustomAuthenticationEntryPointHandler;
 import com.encore.space.domain.login.jwt.JwtAuthFilter;
 import com.encore.space.domain.login.handler.LoginFailureHandler;
 import com.encore.space.domain.login.handler.LoginSuccessHandler;
 import com.encore.space.domain.login.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -112,7 +105,7 @@ public class SecurityConfig {
     };
 
     private static final String[] MemberApiUrl = {
-            "/api/member/doLogin",
+            "/api/member/login",
             "/api/member/create",
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import redis.clients.jedis.Jedis;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -34,16 +35,18 @@ public class JwtProvider {
     @Value("${jwt.refreshTokenTime}")
     int refreshTokenTime;
 
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
     private final RedisTemplate<String,String> redisTemplate;
 
     public JwtProvider(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    public String createAccessToken(String email, Long id ,String role){
+    public String createAccessToken(String email,String role){
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role",role);
-        claims.put("userId", id);
         Date now = new Date();
 
         Key key = Keys.hmacShaKeyFor(accessTokenSecretKey.getBytes(StandardCharsets.UTF_8));
@@ -56,10 +59,10 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createRefreshToken (String email, Long id ,String role){
+    public String createRefreshToken (String email,String role, String clientIP){
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("role",role);
-        claims.put("userId", id);
+        claims.put("clientIP", clientIP);
         Date now = new Date();
 
         Key key = Keys.hmacShaKeyFor(refreshTokenSecretKey.getBytes(StandardCharsets.UTF_8));
@@ -68,7 +71,7 @@ public class JwtProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenTime * 24 * 60 * 60 * 1000L))
-                .signWith( key, SignatureAlgorithm.HS256)
+                .signWith( key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -98,19 +101,32 @@ public class JwtProvider {
                 .getBody();
     }
 
-    public Map<String, Object> exportToken(String email, Long id , String role){
+    public Map<String, Object> exportToken(String email, String role, String clientIP){
         String accessToken = this.createAccessToken(
-                email, id, role
+                email, role
         );
 
         String refreshToken = this.createRefreshToken(
-                email, id, role
+                email, role, clientIP
         );
-
         redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.DAYS);
 
         Map<String, Object> map = new HashMap<>();
         map.put("accessToken", accessToken);
+        return  map;
+    }
+
+    public Map<String, Object> reExportToken(String email, String role, String accessToken, String refreshToken){
+        String newAccessToken = this.createAccessToken(
+                email, role
+        );
+        Jedis jedis = new Jedis(redisHost, 6379);
+        long ttl = jedis.ttl(accessToken);
+        redisTemplate.delete(accessToken);
+        redisTemplate.opsForValue().set(newAccessToken, refreshToken, ttl, TimeUnit.SECONDS);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("accessToken", newAccessToken);
         return  map;
     }
 }

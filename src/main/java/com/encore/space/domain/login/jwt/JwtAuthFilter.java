@@ -1,5 +1,6 @@
 package com.encore.space.domain.login.jwt;
 
+import com.encore.space.common.config.WebConfig;
 import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.login.domain.CustomUserDetails;
 import com.encore.space.domain.login.service.LoginService;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SignatureException;
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -42,16 +44,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, String> redisTemplate;
+    private final WebConfig webConfig;
 
     @Autowired
     public JwtAuthFilter(
             ObjectMapper objectMapper,
             JwtProvider jwtProvider,
-            RedisTemplate<String, String> redisTemplate
+            RedisTemplate<String, String> redisTemplate,
+            WebConfig webConfig
     ) {
         this.objectMapper = objectMapper;
         this.jwtProvider = jwtProvider;
         this.redisTemplate = redisTemplate;
+        this.webConfig = webConfig;
     }
 
     @Override
@@ -62,7 +67,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Claims claims = jwtProvider.validateAccessToken(token);
                 if (claims != null) {
                     CustomUserDetails customUserDetails = CustomUserDetails.builder()
-                            .userId(((Integer) claims.get("userId")).longValue())
                             .role(claims.get("role").toString())
                             .username(claims.getSubject())
                             .password("")
@@ -91,12 +95,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 String refreshToken = redisTemplate.opsForValue().get(token);
                 if(refreshToken != null){
                     Claims claims = jwtProvider.validateRefreshToken(refreshToken);
-                    errorMessage = "토큰을 재발행 합니다.";
-                    errorException = jwtProvider.exportToken(
-                            claims.getSubject(),
-                            ((Integer) claims.get("userId")).longValue(),
-                            claims.get("role").toString()
-                    );
+                    if(claims.get("clientIP").toString().equals(webConfig.ipCheck(request))){
+                        errorMessage = "토큰을 재발행 합니다.";
+                        errorException = jwtProvider.reExportToken(
+                                claims.getSubject(),
+                                claims.get("role").toString(),
+                                token,
+                                refreshToken
+                        );
+                    }
                 }else{
                     errorException = "로그인 만료";
                 }
