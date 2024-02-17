@@ -8,6 +8,7 @@ import com.encore.space.domain.space.domain.SpaceRole;
 import com.encore.space.domain.space.domain.SpaceType;
 import com.encore.space.domain.space.dto.reqdto.CreateSpaceReqDto;
 import com.encore.space.domain.space.dto.resdto.CreateSpaceResDto;
+import com.encore.space.domain.space.dto.resdto.GetSpaceMemberResDto;
 import com.encore.space.domain.space.repository.SpaceMemberRepository;
 import com.encore.space.domain.space.repository.SpaceRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class SpaceService {
@@ -36,6 +38,7 @@ public class SpaceService {
         this.spaceMemberRepo = spaceMemberRepo;
     }
 
+//    Create
     public CreateSpaceResDto createSpaceWithMembers(SpaceType spaceType, CreateSpaceReqDto dto) {
 
         Space space = Space.builder()
@@ -71,4 +74,13 @@ public class SpaceService {
     }
 
 
+//    Read
+    public List<GetSpaceMemberResDto> getSpaceMembers(Long spaceId) {
+        Space space = spaceRepo.findById(spaceId)
+                .orElseThrow(()-> new EntityNotFoundException("찾으시는 스페이스가 없습니다."));
+        List<SpaceMember> spaceMembers = spaceMemberRepo.findBySpace(space);
+        return spaceMembers.stream()
+                .map(GetSpaceMemberResDto::new)
+                .collect(Collectors.toList());
+    }
 }

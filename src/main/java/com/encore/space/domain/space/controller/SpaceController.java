@@ -7,10 +7,7 @@ import com.encore.space.domain.space.service.SpaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("space")
@@ -44,6 +41,17 @@ public class SpaceController {
                 HttpStatus.CREATED, "그룹 스페이스가 생성되었습니다",
                 spaceService.createSpaceWithMembers(SpaceType.GROUP, dto));
     }
+
+
+//    Read
+    @GetMapping("{spaceId}/members")
+    public ResponseEntity<CommonResponse> getSpace(@PathVariable Long spaceId) {
+        return response(
+                HttpStatus.OK, "스페이스에 속해있는 맴버 정보를 조회하였습니다",
+                spaceService.getSpaceMembers(spaceId));
+    }
+
+
 
 
 //    리스폰 함수 공통화
