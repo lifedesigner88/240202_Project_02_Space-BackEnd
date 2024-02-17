@@ -21,6 +21,7 @@ public class CreateSpaceResDto {
     public static class MemberInfo {
         private final String role;
         private final String name;
+        private final String nickName;
         private final String email;
 
     }
@@ -34,6 +35,7 @@ public class CreateSpaceResDto {
             this.spaceMembers.add(
                     MemberInfo.builder()
                             .role(member.getSpaceRole().toString())
+                            .nickName(member.getMember().getNickname())
                             .name(member.getMember().getName())
                             .email(member.getMember().getEmail())
                             .build());
