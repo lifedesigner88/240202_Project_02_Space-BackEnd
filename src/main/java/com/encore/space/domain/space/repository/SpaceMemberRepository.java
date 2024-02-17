@@ -10,14 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SpaceMemberRepository extends JpaRepository<SpaceMember, SpaceMemberId> {
+public interface SpaceMemberRepository
+        extends JpaRepository<SpaceMember, SpaceMemberId> {
 
     List<SpaceMember> findBySpace(Space space);
-
-    List<SpaceMember> findByMemberId(Long memberId);
+    List<SpaceMember> findByMember(Member member);
 
     // 스페이스에서 나갈 때 사용
     SpaceMember findBySpaceAndMember(Space space, Member member);
-
 
 }

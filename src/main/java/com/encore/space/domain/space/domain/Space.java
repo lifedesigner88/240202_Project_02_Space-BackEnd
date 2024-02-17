@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Entity
 public class Space extends BaseEntity {
@@ -24,6 +27,9 @@ public class Space extends BaseEntity {
     private String description;
     private String spaceThumbNailPath;
 
+    @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
+    private final List<SpaceMember> spaceMembers = new ArrayList<>();
+
     @Setter
     private String delYn = "N";
 
@@ -37,5 +43,12 @@ public class Space extends BaseEntity {
     }
 
     public Space() {}
+
+    public void setSpaceMembers(List<SpaceMember> spaceMembers) {
+        this.spaceMembers.clear();
+        if (spaceMembers != null) {
+            this.spaceMembers.addAll(spaceMembers);
+        }
+    }
 }
 

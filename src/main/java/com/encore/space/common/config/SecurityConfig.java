@@ -112,6 +112,12 @@ public class SecurityConfig {
 
             // 테스트용
             "/api/member/qwe",
+
+//            스페이스 테스트
+            "/space/**"
+
+
+
     };
 
     private static final String[] LoginApiUrl = {

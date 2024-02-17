@@ -18,8 +18,6 @@ public class SpaceMember extends BaseEntity {
     @JoinColumn(nullable = false)
     @Id private Member member;
 
-    @Column(nullable = false)
-    private String spaceName;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
@@ -29,11 +27,9 @@ public class SpaceMember extends BaseEntity {
     private String delYn = "N";
 
     @Builder
-    public SpaceMember(Space space, Member member,
-                       String spaceName, SpaceRole spaceRole) {
+    public SpaceMember(Space space, Member member, SpaceRole spaceRole) {
         this.space = space;
         this.member = member;
-        this.spaceName = spaceName;
         this.spaceRole = spaceRole;
     }
 
