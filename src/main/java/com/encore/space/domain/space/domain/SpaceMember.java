@@ -5,9 +5,9 @@ import com.encore.space.domain.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Getter
 @Entity
+@IdClass(SpaceMemberId.class)
 public class SpaceMember extends BaseEntity {
 
     @ManyToOne
@@ -39,3 +39,8 @@ public class SpaceMember extends BaseEntity {
 
     public SpaceMember() {}
 }
+
+
+
+
+

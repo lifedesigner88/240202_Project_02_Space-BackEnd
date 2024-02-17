@@ -1,4 +1,5 @@
 package com.encore.space.domain.space.service;
 
-public class PostService {
+public class SpaceService {
+
 }
