@@ -113,10 +113,9 @@ public class SecurityConfig {
             // 테스트용
             "/api/member/qwe",
 
-//            스페이스 테스트
-            "/space/**"
-
-
+//           도커 고장으로 테스트(세종)
+            "/space/**",
+            "/schedule/**"
 
     };
 

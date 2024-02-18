@@ -24,7 +24,7 @@ public class ScheduleMember {
     @Setter
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private Attendance attendance = Attendance.OWNER;
+    private Attendance attendance;
 
     @Builder
     public ScheduleMember(Schedule schedule, Member member, Attendance attendance) {
@@ -32,5 +32,7 @@ public class ScheduleMember {
         this.member = member;
         this.attendance = attendance;
     }
-    public ScheduleMember() {}
+
+    public ScheduleMember() {
+    }
 }
