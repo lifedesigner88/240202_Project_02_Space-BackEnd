@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SpaceMemberRepository
@@ -17,6 +18,6 @@ public interface SpaceMemberRepository
     List<SpaceMember> findByMember(Member member);
 
     // 스페이스에서 나갈 때 사용
-    SpaceMember findBySpaceAndMember(Space space, Member member);
+    Optional<SpaceMember> findBySpaceAndMember(Space space, Member member);
 
 }

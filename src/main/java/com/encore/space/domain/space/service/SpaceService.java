@@ -75,7 +75,7 @@ public class SpaceService {
     }
 
 //    Read
-    public List<GetSpaceMemberResDto> getSpaceMembers(Long spaceId) {
+    public List<GetSpaceMemberResDto> getMembersBySapceId(Long spaceId) {
         Space space = spaceRepo.findById(spaceId)
                 .orElseThrow(()-> new EntityNotFoundException("찾으시는 스페이스가 없습니다."));
         List<SpaceMember> spaceMembers = spaceMemberRepo.findBySpace(space);
@@ -93,4 +93,7 @@ public class SpaceService {
                 .map(GetSpacesByEmailResDto::new)
                 .collect(Collectors.toList());
     }
+
+
+
 }

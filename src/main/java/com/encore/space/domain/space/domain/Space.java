@@ -1,6 +1,8 @@
 package com.encore.space.domain.space.domain;
 
 import com.encore.space.common.domain.BaseEntity;
+import com.encore.space.domain.post.domain.Post;
+import com.encore.space.domain.schedule.domain.Schedule;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,11 +26,11 @@ public class Space extends BaseEntity {
     @Column(nullable = false)
     private SpaceType spaceType;
 
+    @Setter
     private String description;
-    private String spaceThumbNailPath;
 
-    @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
-    private final List<SpaceMember> spaceMembers = new ArrayList<>();
+    @Setter
+    private String spaceThumbNailPath;
 
     @Setter
     private String delYn = "N";
@@ -44,11 +46,33 @@ public class Space extends BaseEntity {
 
     public Space() {}
 
+    @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
+    private final List<SpaceMember> spaceMembers = new ArrayList<>();
     public void setSpaceMembers(List<SpaceMember> spaceMembers) {
         this.spaceMembers.clear();
         if (spaceMembers != null) {
             this.spaceMembers.addAll(spaceMembers);
         }
     }
+
+    @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
+    private final List<Schedule> schedules = new ArrayList<>();
+    public void setSchedules(Schedule schedules) {
+        this.schedules.clear();
+        if (schedules != null) {
+            this.schedules.add(schedules);
+        }
+    }
+
+    @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
+    private final List<Post> posts = new ArrayList<>();
+    public void setPosts(Post post) {
+        this.posts.clear();
+        if (post != null) {
+            this.posts.add(post);
+        }
+    }
+
+
 }
 

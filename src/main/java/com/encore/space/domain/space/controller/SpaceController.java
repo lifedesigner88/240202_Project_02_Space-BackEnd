@@ -45,17 +45,17 @@ public class SpaceController {
 
 //    Read
     @GetMapping("{spaceId}/members")
-    public ResponseEntity<CommonResponse> getSpaceMembers(@PathVariable Long spaceId) {
+    public ResponseEntity<CommonResponse> getMembersBySapceId(@PathVariable Long spaceId) {
         return response(
                 HttpStatus.OK, "스페이스에 속해있는 맴버 정보를 조회하였습니다",
-                spaceService.getSpaceMembers(spaceId));
+                spaceService.getMembersBySapceId(spaceId));
     }
 
 
     @GetMapping("/spaces/{email}")  // 집에 도커가 작동안해서 우선 이렇게 하였음
     public ResponseEntity<CommonResponse> getSpacesByEmail(@PathVariable String email) {
         return response(
-                HttpStatus.OK, "스페이스에 속해있는 맴버 정보를 조회하였습니다",
+                HttpStatus.OK, "로그인한 회원이 속해있는 스페이스 정보를 조회하였습니다.",
                 spaceService.getSpacesByEamil(email));
     }
 
