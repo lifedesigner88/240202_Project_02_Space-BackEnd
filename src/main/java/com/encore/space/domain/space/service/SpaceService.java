@@ -9,6 +9,7 @@ import com.encore.space.domain.space.domain.SpaceType;
 import com.encore.space.domain.space.dto.reqdto.CreateSpaceReqDto;
 import com.encore.space.domain.space.dto.resdto.CreateSpaceResDto;
 import com.encore.space.domain.space.dto.resdto.GetSpaceMemberResDto;
+import com.encore.space.domain.space.dto.resdto.GetSpacesByEmailResDto;
 import com.encore.space.domain.space.repository.SpaceMemberRepository;
 import com.encore.space.domain.space.repository.SpaceRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -52,7 +53,7 @@ public class SpaceService {
         for (CreateSpaceReqDto.MemberEmailAndSpaceRole memberDto : dto.getSpaceMembers()) {
             String email = memberDto.getMemberEmail();
             Member member = memberRepo.findByEmail(email)
-                    .orElseThrow(() -> new EntityNotFoundException( email + " 없는 이메일 입니다"));
+                    .orElseThrow(() -> new EntityNotFoundException( email + " : 없는 이메일 입니다"));
             SpaceRole spaceRole = SpaceRole.CAPTAIN;
             if(!memberDto.getSpaceRole().equals("CAPTAIN")) spaceRole = SpaceRole.CREW;
             members.put(member, spaceRole);
@@ -73,7 +74,6 @@ public class SpaceService {
         return new CreateSpaceResDto(savedSpace, spaceMembers);
     }
 
-
 //    Read
     public List<GetSpaceMemberResDto> getSpaceMembers(Long spaceId) {
         Space space = spaceRepo.findById(spaceId)
@@ -81,6 +81,16 @@ public class SpaceService {
         List<SpaceMember> spaceMembers = spaceMemberRepo.findBySpace(space);
         return spaceMembers.stream()
                 .map(GetSpaceMemberResDto::new)
+                .collect(Collectors.toList());
+    }
+    public List<GetSpacesByEmailResDto> getSpacesByEamil(String email) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String email = authentication.getName();
+        Member member = memberRepo.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(email + " : 없는 이메일 입니다."));
+        List<SpaceMember> spaceMembers = spaceMemberRepo.findByMember(member);
+        return spaceMembers.stream()
+                .map(GetSpacesByEmailResDto::new)
                 .collect(Collectors.toList());
     }
 }
