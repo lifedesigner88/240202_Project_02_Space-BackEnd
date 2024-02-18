@@ -6,13 +6,13 @@ import com.encore.space.domain.space.domain.SpaceMember;
 import lombok.Getter;
 
 @Getter
-public class GetSpaceMemberResDto {
+public class MembersBySpaceResDto {
     private final String role;
     private final String name;
     private final String nickName;
     private final String email;
 
-    public GetSpaceMemberResDto (SpaceMember spaceMember){
+    public MembersBySpaceResDto(SpaceMember spaceMember){
         Member member = spaceMember.getMember();
         this.role = spaceMember.getSpaceRole().name();
         this.name = member.getName();

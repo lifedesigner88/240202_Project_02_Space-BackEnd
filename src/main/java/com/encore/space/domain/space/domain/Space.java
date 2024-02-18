@@ -57,21 +57,9 @@ public class Space extends BaseEntity {
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
     private final List<Schedule> schedules = new ArrayList<>();
-    public void setSchedules(Schedule schedules) {
-        this.schedules.clear();
-        if (schedules != null) {
-            this.schedules.add(schedules);
-        }
-    }
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.PERSIST)
     private final List<Post> posts = new ArrayList<>();
-    public void setPosts(Post post) {
-        this.posts.clear();
-        if (post != null) {
-            this.posts.add(post);
-        }
-    }
 
 
 }

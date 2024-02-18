@@ -12,14 +12,14 @@ public class CreateSpaceResDto {
     private final String spaceName;
     private final String description;
     private final String spaceThumbNailPath;
-    private final List<GetSpaceMemberResDto> spaceMembers;
+    private final List<MembersBySpaceResDto> spaceMembers;
 
     public CreateSpaceResDto(Space space, List<SpaceMember> spaceMembers) {
         this.spaceName = space.getSpaceName();
         this.description = space.getDescription();
         this.spaceThumbNailPath = space.getSpaceThumbNailPath();
         this.spaceMembers = spaceMembers.stream()
-                .map(GetSpaceMemberResDto::new)
+                .map(MembersBySpaceResDto::new)
                 .collect(Collectors.toList());
     }
 }
