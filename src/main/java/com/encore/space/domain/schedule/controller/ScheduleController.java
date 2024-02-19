@@ -14,23 +14,19 @@ public class ScheduleController {
 
 
     private final ScheduleService scheduleService;
-
-
     public ScheduleController(@Autowired ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
     }
 
-
-    @PostMapping("{spaceId}/create/{email}") // 레디스 고장
+    @PostMapping("{spaceId}/create")
     public ResponseEntity<CommonResponse> createSchedule(
             @PathVariable String spaceId,
-            @PathVariable String email, // 레디스 고장나서 임시로
             @RequestBody CreateScheduleReqDto dto) {
+        return CommonResponse.responseMassage(
+                HttpStatus.CREATED,
+                "스페이스에 일정이 생성되었습니다",
+                scheduleService.createSchedule(spaceId, dto)
 
-        return response(HttpStatus.CREATED, "테스트", scheduleService.createSchedule(spaceId,  email, dto));
-    }
-
-    public ResponseEntity<CommonResponse> response(HttpStatus httpStatus, String message, Object object) {
-        return new ResponseEntity<>(new CommonResponse(httpStatus, message, object), httpStatus);
+        );
     }
 }

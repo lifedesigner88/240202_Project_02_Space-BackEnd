@@ -1,7 +1,8 @@
 package com.encore.space.domain.space.service;
 
+import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.member.domain.Member;
-import com.encore.space.domain.member.repository.MemberRepository;
+import com.encore.space.domain.member.service.MemberService;
 import com.encore.space.domain.post.domain.Post;
 import com.encore.space.domain.post.repository.PostRepository;
 import com.encore.space.domain.schedule.domain.Schedule;
@@ -16,6 +17,8 @@ import com.encore.space.domain.space.repository.SpaceMemberRepository;
 import com.encore.space.domain.space.repository.SpaceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,43 +32,44 @@ public class SpaceService {
 
     private final SpaceRepository spaceRepo;
     private final SpaceMemberRepository spaceMemberRepo;
-    private final MemberRepository memberRepo;
     private final ScheduleRepository scheduleRepo;
     private final PostRepository postRepo;
+    private final MemberService memberService;
+    private final ChangeType changeType;
 
     @Autowired
-    public SpaceService(SpaceRepository spaceRepo, MemberRepository memberRepo,
-                        SpaceMemberRepository spaceMemberRepo, ScheduleRepository scheduleRepo,
-                        PostRepository postRepo) {
+    public SpaceService(SpaceRepository spaceRepo, SpaceMemberRepository spaceMemberRepo,
+                        MemberService memberService, ScheduleRepository scheduleRepo,
+                        PostRepository postRepo, ChangeType changeType) {
         this.spaceRepo = spaceRepo;
-        this.memberRepo = memberRepo;
+        this.memberService = memberService;
         this.spaceMemberRepo = spaceMemberRepo;
         this.scheduleRepo = scheduleRepo;
         this.postRepo = postRepo;
+        this.changeType = changeType;
     }
 
-//    Create
+    //    함수 공통화
+    public Space findSpaceBySapceId(Long spaceId) {
+        return spaceRepo.findById(spaceId)
+                .orElseThrow(() -> new EntityNotFoundException("찾으시는 스페이스가 없습니다."));
+    }
+
+    //    Create
     public CreateSpaceResDto createSpaceWithMembers(SpaceType spaceType, CreateSpaceReqDto dto) {
+        Space space = changeType.makeReqDtoTOSpace(spaceType, dto);
 
-        Space space = Space.builder()
-                .spaceName(dto.getSpaceName())
-                .spaceType(spaceType)
-                .description(dto.getDescription())
-                .spaceThumbNailPath(dto.getSpaceThumbNailPath() + (10 + (int)(Math.random()*90)))
-                .build();
-
-        Map<Member,SpaceRole> members = new HashMap<>();
+        Map<Member, SpaceRole> members = new HashMap<>();
         for (CreateSpaceReqDto.MemberEmailAndSpaceRole memberDto : dto.getSpaceMembers()) {
             String email = memberDto.getMemberEmail();
-            Member member = memberRepo.findByEmail(email)
-                    .orElseThrow(() -> new EntityNotFoundException( email + " : 없는 이메일 입니다"));
+            Member member = memberService.findByEmail(email);
             SpaceRole spaceRole = SpaceRole.CAPTAIN;
-            if(!memberDto.getSpaceRole().equals("CAPTAIN")) spaceRole = SpaceRole.CREW;
+            if (!memberDto.getSpaceRole().equals("CAPTAIN")) spaceRole = SpaceRole.CREW;
             members.put(member, spaceRole);
         }
 
         List<SpaceMember> spaceMembers = new ArrayList<>();
-        for(Map.Entry<Member,SpaceRole> entry : members.entrySet()) {
+        for (Map.Entry<Member, SpaceRole> entry : members.entrySet()) {
             SpaceMember spaceMember =
                     SpaceMember.builder()
                             .space(space)
@@ -76,23 +80,23 @@ public class SpaceService {
         }
         space.setSpaceMembers(spaceMembers);
         Space savedSpace = spaceRepo.save(space);
-        return new CreateSpaceResDto(savedSpace, spaceMembers);
+        return changeType.spaceTOcreateSpaceResDto(savedSpace, spaceMembers);
     }
 
-//    Read
+    //    Read
     public List<MembersBySpaceResDto> getMembersBySpaceId(Long spaceId) {
         Space space = findSpaceBySapceId(spaceId);
         List<SpaceMember> spaceMembers = spaceMemberRepo.findBySpace(space);
         return spaceMembers.stream()
-                .map(MembersBySpaceResDto::new)
+                .map(changeType::spaceMemberTOmembersBySpaceResDto)
                 .collect(Collectors.toList());
     }
 
-    public List<SchedulesBySpaceResDto> getSchedulesBySpaceId(Long spaceId){
+    public List<SchedulesBySpaceResDto> getSchedulesBySpaceId(Long spaceId) {
         Space space = findSpaceBySapceId(spaceId);
         List<Schedule> schedules = scheduleRepo.findBySpace(space);
         return schedules.stream()
-                .map(SchedulesBySpaceResDto::new)
+                .map(changeType::scheduleTOschedulesBySpaceResDto)
                 .collect(Collectors.toList());
     }
 
@@ -100,34 +104,25 @@ public class SpaceService {
         Space space = findSpaceBySapceId(spaceId);
         List<Post> posts = postRepo.findBySpace(space);
         return posts.stream()
-                .map(PostsBySpaceResDto::new)
+                .map(changeType::postsTOpostsBySpaceResDto)
                 .collect(Collectors.toList());
     }
 
-    public List<GetSpacesByEmailResDto> getSpacesByEamil(String email) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String email = authentication.getName();
-        Member member = memberRepo.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(email + " : 없는 이메일 입니다."));
+    public List<GetSpacesByEmailResDto> getSpacesByEamil() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Member member = memberService.findByEmail(email);
         List<SpaceMember> spaceMembers = spaceMemberRepo.findByMember(member);
         return spaceMembers.stream()
-                .map(GetSpacesByEmailResDto::new)
+                .map(changeType::spaceMemberTOgetSpacesByEmailResDto)
                 .collect(Collectors.toList());
     }
 
     public List<GetAllSpacesResDto> getAllSpaces() {
         List<Space> spaces = spaceRepo.findAll();
         return spaces.stream()
-                .map(GetAllSpacesResDto::new)
+                .map(changeType::spaceTOgetAllSpaceResDto)
                 .collect(Collectors.toList());
     }
-
-//    함수 공통화
-
-    private Space findSpaceBySapceId(Long spaceId) {
-        return spaceRepo.findById(spaceId)
-                .orElseThrow(()-> new EntityNotFoundException("찾으시는 스페이스가 없습니다."));
-    }
-
 
 }

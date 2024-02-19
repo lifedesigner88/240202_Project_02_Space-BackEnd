@@ -20,5 +20,4 @@ public class CreateSpaceReqDto {
         private String memberEmail;
         private String spaceRole;
     }
-
 }
