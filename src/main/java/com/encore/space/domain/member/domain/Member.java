@@ -1,7 +1,20 @@
 package com.encore.space.domain.member.domain;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import com.encore.space.common.domain.BaseEntity;
-import jakarta.persistence.*;
+import com.encore.space.domain.chat.domain.MemberChatRoom;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,5 +54,9 @@ public class Member extends BaseEntity {
 
     @Builder.Default
     private String delYn = "N";
+
+    @Builder.Default
+    @OneToMany(fetch = LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberChatRoom> memberChatRooms = new ArrayList<>();
 
 }
