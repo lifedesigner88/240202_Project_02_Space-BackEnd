@@ -22,7 +22,7 @@ public class ScheduleController {
     public ResponseEntity<CommonResponse> createSchedule(
             @PathVariable String spaceId,
             @RequestBody CreateScheduleReqDto dto) {
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.CREATED,
                 "스페이스에 일정이 생성되었습니다",
                 scheduleService.createSchedule(spaceId, dto)

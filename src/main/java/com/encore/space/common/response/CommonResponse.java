@@ -25,7 +25,7 @@ public class CommonResponse {
     })
     private Object result;
 
-    public static ResponseEntity<CommonResponse> responseMassage(HttpStatus status, String message, Object object) {
+    public static ResponseEntity<CommonResponse> responseMessage(HttpStatus status, String message, Object object) {
         return new ResponseEntity<>(
                 CommonResponse.builder()
                         .httpStatus(status)
@@ -36,7 +36,7 @@ public class CommonResponse {
                 status
         );
     }
-    public static ResponseEntity<CommonResponse> responseMassage(HttpStatus status, String message){
+    public static ResponseEntity<CommonResponse> responseMessage(HttpStatus status, String message){
         return new ResponseEntity<>(
                 CommonResponse.builder()
                         .httpStatus(status)
