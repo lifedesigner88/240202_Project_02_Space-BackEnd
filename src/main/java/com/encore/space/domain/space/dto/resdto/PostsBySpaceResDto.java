@@ -18,7 +18,5 @@ public class PostsBySpaceResDto {
     private final Long postId;
     private final String title;
     private final String contents;
-    private final Long viewCount;
-    private final int likes;
 
 }

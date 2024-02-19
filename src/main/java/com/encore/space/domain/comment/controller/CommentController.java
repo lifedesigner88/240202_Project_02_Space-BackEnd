@@ -37,7 +37,7 @@ public class CommentController {
                                                       @RequestBody CommentCreateDto commentCreateDto,
                                                       @AuthenticationPrincipal CustomUserDetails userDetails){
         commentService.save(commentCreateDto, id,userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.CREATED,
                 "comment successfully created");
     }
@@ -49,7 +49,7 @@ public class CommentController {
     )
     @GetMapping("/list/{postId}")
     public ResponseEntity<CommonResponse> getCommentList(@PathVariable("postId") Long postId){
-       return CommonResponse.responseMassage(
+       return CommonResponse.responseMessage(
                HttpStatus.OK,
                "comment list successfully loaded",
                commentService.findAll(postId));
@@ -62,7 +62,7 @@ public class CommentController {
     @GetMapping("/list/{postId}/{commentId}")
     public ResponseEntity<CommonResponse> getChildrenComments(@PathVariable("postId") Long postId,
                                                               @PathVariable("commentId") Long commentId ){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "Children comment list successfully loaded",
                 commentService.findChildrenComments(postId, commentId));
@@ -77,7 +77,7 @@ public class CommentController {
                                                         @RequestBody CommentUpdateDto commentUpdateDto,
                                                         @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
         commentService.update(id, commentUpdateDto, userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "comment successfully updated");
     }
@@ -90,7 +90,7 @@ public class CommentController {
     public ResponseEntity<CommonResponse> deleteComment(@PathVariable("commentId") Long commentId,
                                                         @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
         commentService.delete(commentId,userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "comment successfully deleted");
     }

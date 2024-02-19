@@ -3,7 +3,6 @@ package com.encore.space.domain.file.controller;
 import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.file.service.FileService;
-import com.encore.space.domain.login.domain.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -36,7 +34,7 @@ public class FileController {
     )
     @GetMapping("/list/{postId}")
     public ResponseEntity<CommonResponse> fileList(@PathVariable Long postId){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "success",
                 fileService.getFileList(postId));
@@ -50,7 +48,7 @@ public class FileController {
     @DeleteMapping("/delete/{fileId}")
     public ResponseEntity<CommonResponse> deleteFile(@PathVariable ("fileId") Long id){
         fileService.delete(id);
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "file deleted successfully");
     }
