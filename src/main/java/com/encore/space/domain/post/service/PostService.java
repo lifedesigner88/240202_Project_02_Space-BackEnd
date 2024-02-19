@@ -1,4 +1,130 @@
 package com.encore.space.domain.post.service;
 
+import com.encore.space.common.domain.ChangeType;
+import com.encore.space.domain.comment.domain.Comment;
+import com.encore.space.domain.comment.repository.CommentRepository;
+import com.encore.space.domain.comment.service.CommentService;
+import com.encore.space.domain.file.domain.AttachFile;
+import com.encore.space.domain.file.service.FileService;
+import com.encore.space.domain.hearts.HeartRepository;
+import com.encore.space.domain.hearts.service.HeartService;
+import com.encore.space.domain.member.domain.Member;
+import com.encore.space.domain.member.domain.Role;
+import com.encore.space.domain.member.service.MemberService;
+import com.encore.space.domain.post.domain.Post;
+import com.encore.space.domain.post.dto.PostCreateDto;
+import com.encore.space.domain.post.dto.PostDetailResDto;
+import com.encore.space.domain.post.dto.PostListDto;
+import com.encore.space.domain.post.dto.PostUpdateDto;
+import com.encore.space.domain.post.repository.PostRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Slf4j
+@Service
+@Transactional
 public class PostService {
+
+    private final PostRepository postRepository;
+    private final FileService fileService;
+    private final HeartService heartService;
+    private final MemberService memberService;
+    private final CommentRepository commentRepository;
+    private final HeartRepository heartRepository;
+    private final ChangeType changeType;
+
+    @Autowired
+    public PostService(PostRepository postRepository,
+                       FileService fileService,
+                       HeartService heartService,
+                       MemberService memberService,
+                       CommentRepository commentRepository,
+                       HeartRepository heartRepository,
+                       ChangeType changeType) {
+        this.postRepository = postRepository;
+        this.fileService = fileService;
+        this.heartService = heartService;
+        this.memberService = memberService;
+        this.commentRepository = commentRepository;
+        this.heartRepository = heartRepository;
+        this.changeType = changeType;
+    }
+
+    //게시글 가져오기
+    public Post findByPostId(Long postId) throws EntityNotFoundException {
+        Post post = postRepository.findById(postId).orElseThrow(EntityNotFoundException::new);
+        return post;
+    }
+
+    //게시글 저장 with 이미지파일(첨부파일)
+    public void save(PostCreateDto postCreateDto, String email) throws EntityNotFoundException {
+        Member member= memberService.findByEmail(email);
+        Post post= postRepository.save(changeType.postCreateDtoToPost(postCreateDto,member));
+        if (!postCreateDto.getAttachFileList().isEmpty()) {
+            fileService.uploadAttachFiles(postCreateDto.getAttachFileList(), post);
+        }
+    }
+
+    //게시글 상세 조회
+    public PostDetailResDto getPost(Long postId) throws EntityNotFoundException {
+        Post post= this.findByPostId(postId);
+        Long postHearts= heartService.postHearts(postId);
+        if (post.getDelYN().equals("Y")) {
+            throw new EntityNotFoundException("삭제된 게시글입니다.");
+        } else {
+            return changeType.postToPostDetailResDto(post,postHearts);
+        }
+    }
+
+    //게시글 목록 조회    --> 상의
+    public List<PostListDto> findAll() {
+        List<PostListDto> postListDtoList = new ArrayList<>();
+        List<Post> posts = postRepository.findAll();
+        for (Post p : posts) {
+            if (p.getDelYN().equals("N")) {
+                changeType.postToPostListDto(p);
+            }
+        }
+        return postListDtoList;
+    }
+
+    //게시글 수정
+    public void updatePost(Long id, PostUpdateDto postUpdateDto,String email) throws EntityNotFoundException, AccessDeniedException {
+        Member member= memberService.findByEmail(email);
+        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("작성하신 글이 없습니다."));
+        if(Objects.equals(member.getId(), post.getMember().getId())) {
+            post.updatePost(postUpdateDto.getTitle(), postUpdateDto.getContents(), postUpdateDto.getPostStatus());
+            postRepository.save(post);
+            if (!postUpdateDto.getAttachFileList().isEmpty()) {
+                fileService.uploadAttachFiles(postUpdateDto.getAttachFileList(), post);
+            }
+        } else {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
+    }
+
+    //게시글 삭제
+    public void delete(Long postId, String email) throws EntityNotFoundException, AccessDeniedException {
+        Member member= memberService.findByEmail(email);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시물입니다."));
+        if(member.getId()==post.getMember().getId() || member.getRole().equals(Role.MANAGER) || member.getRole().equals(Role.TEACHER)) {
+            List<Comment> postComment = commentRepository.findAllByPostId(postId);
+            for (Comment c : postComment) {
+                c.delete();
+            }
+            heartService.deleteHearts(heartRepository.findByPostId(postId));
+            post.deletePost();
+        } else {
+            throw new AccessDeniedException ("권한이 없습니다.");
+        }
+    }
 }
