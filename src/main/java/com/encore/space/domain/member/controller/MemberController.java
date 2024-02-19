@@ -19,15 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 
 @Slf4j
 @Tag(name = "회원관련 API")
@@ -53,7 +49,7 @@ public class MemberController {
     )
     @PostMapping("/create")
     public ResponseEntity<CommonResponse> memberCreate(@RequestBody @Valid MemberReqDto memberReqDto){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.CREATED,
                 "회원가입 성공",
                 memberService.memberCreate(memberReqDto)
@@ -66,7 +62,7 @@ public class MemberController {
     )
     @PostMapping("/emailAuthentication")
     public ResponseEntity<CommonResponse> emailAuthentication(@RequestBody @Valid EmailReqDto emailReqDto) throws MessagingException, NoSuchAlgorithmException, UnsupportedEncodingException {
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "이메일 인증번호 발송",
                 memberService.emailAuthentication(emailReqDto)
@@ -80,7 +76,7 @@ public class MemberController {
     @PostMapping("/emailCheck")
     public ResponseEntity<CommonResponse> emailCheck(@RequestBody @Valid EmailCodeReqDto emailCodeReqDto) {
         memberService.emailCheck(emailCodeReqDto);
-        return CommonResponse.responseMassage(HttpStatus.OK, "이메일 인증완료");
+        return CommonResponse.responseMessage(HttpStatus.OK, "이메일 인증완료");
     }
 
     @Operation(
@@ -89,7 +85,7 @@ public class MemberController {
     )
     @PostMapping("/login")
     public ResponseEntity<CommonResponse> emailLogin(@RequestBody @Valid LoginReqDto loginReqDto) {
-        return CommonResponse.responseMassage(HttpStatus.OK, "로그인 되었습니다.", loginService.login(loginReqDto, LoginType.EMAIL));
+        return CommonResponse.responseMessage(HttpStatus.OK, "로그인 되었습니다.", loginService.login(loginReqDto, LoginType.EMAIL));
     }
 
     @Operation(
@@ -99,7 +95,7 @@ public class MemberController {
     @GetMapping("/logout")
     public ResponseEntity<CommonResponse> logout(HttpServletRequest request) {
         loginService.logout(request);
-        return CommonResponse.responseMassage(HttpStatus.OK, "로그아웃 되었습니다.");
+        return CommonResponse.responseMessage(HttpStatus.OK, "로그아웃 되었습니다.");
     }
 
 
