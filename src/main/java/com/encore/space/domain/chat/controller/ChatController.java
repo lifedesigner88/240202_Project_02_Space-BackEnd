@@ -1,106 +1,144 @@
 package com.encore.space.domain.chat.controller;
 
-import com.encore.space.domain.chat.dto.ChatDto;
-import com.encore.space.domain.chat.dto.ChatDto.MessageType;
-import com.encore.space.domain.chat.repository.ChatRepository;
+import com.encore.space.domain.chat.domain.Chat;
+import com.encore.space.domain.chat.domain.ChatRoom;
+import com.encore.space.domain.chat.domain.MemberChatRoom;
+import com.encore.space.domain.chat.domain.MessageType;
+import com.encore.space.domain.chat.dto.ChatReqDto;
+import com.encore.space.domain.chat.dto.ChatResDto;
+import com.encore.space.domain.chat.service.ChatRoomService;
+import com.encore.space.domain.chat.service.ChatService;
+import com.encore.space.domain.chat.service.MemberChatRoomService;
+import com.encore.space.domain.member.domain.Member;
+import com.encore.space.domain.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RequiredArgsConstructor
-@Controller
+@RestController
 public class ChatController {
 
-    // convertAndSend를 사용하기 위해 선언.
-    // convertAndSend 메서드는 매개변수로 메시지의 도착지와 ChatDto 객체를 넣어주면
-    // 인자로 들어온 객체를 Message 객체로 변환해서 도착지를 subscribe 하고 있는 모든 사용자에게 메시지를 보내준다.
-    private final SimpMessageSendingOperations template;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final MemberService memberService;
+    private final ChatService chatService;
+    private final ChatRoomService chatRoomService;
+    private final MemberChatRoomService memberChatRoomService;
 
-    @Autowired
-    ChatRepository chatRepository;
+    @Operation (
+            summary = "WebSocket을 통해서 채팅방에 입장하는 경우의 로직을 처리하는 메서드",
+            description = """
+                    - 사용자가 채팅방에 입장할 때 "/chat/enter"를 통해서 메시지 요청이 들어오면 현재 메서드가 호출.
+                    - 사용자가 최초로 입장하면 입장했음을 알리는 메시지를 채팅방에 보낸다.
+                    - memberService와 chatRoomService를 사용해서 사용자와 채팅방의 정보를 가져오고, 시스템은 사용자가 해당 채팅방에 이미 참여하고 있는지 확인한다.
+                    - 만약 참여 중이라면, 채팅 기록을 가져와서 이전에 존재하던 채팅 내역을 보여줄 수 있도록 처리한다.
+                    - 채팅 내역은 /user/{sender}/sub/chat/enter/{roomId}를 구독하고 있는 모든 사용자들에게 전송된다.
+                    - 만약 채팅방에 처음 들어오는 것이라면 사용자를 채팅방에 구독시키고, 사용자가 방에 들어왔다는 메시지를 /sub/chat/{roomId}를 구독하고 있는 모든 사용자들에게 전송한다.
+                    """
+    )
+    @Transactional
+    @MessageMapping("/chat/enter")
+    public void enter(ChatReqDto message) {
+        log.info("enter: {}", message);
+        message.setMessage(message.getSender() + "님이 입장했습니다.");
 
-    // MessageMapping으로 웹소켓을 통해 들어오는 메시지를 처리.
-    // 클라이언트에서는 /pub/chat/enterUser로 요청하고 controller에서 받아서 처리.
-    // convertAndSend로 /sub/chat/room/roomId 로 메시지 전송
-    @MessageMapping("/chat/enterUser")
-    public void enterUser(@Payload ChatDto chatDto, SimpMessageHeaderAccessor headerAccessor) {
-        // 채팅방 유저 1 증가
-        chatRepository.plusUserCount(chatDto.getRoomId());
+        Member member = memberService.findByNickname(message.getSender());
+        ChatRoom chatRoom = chatRoomService.findRoomByRoomId(message.getRoomId());
 
-        // 채팅방 유저 추가 및 UserUUID 반환
-        String userUUID = chatRepository.addUser(chatDto.getRoomId(), chatDto.getSender());
+        if (memberChatRoomService.checkMemberChatroom(member, chatRoom)) {
+            // 특정 채팅룸의 이전 채팅 기록 가져오기
+            List<ChatResDto> chatList = new ArrayList<>();
+            MemberChatRoom memberChatroom = memberChatRoomService.findMemberChatroom(member, chatRoom);
+            List<Chat> allChatList = chatService.findAllChatByRoomIdAndDate(chatRoom,
+                    memberChatroom.getJoinedAt());
+            if (allChatList != null) {
+                allChatList.stream().map(ChatResDto::convertToDto).collect(Collectors.toList());
+            }
+            // 해당 URL을 구독하고 있는 사람들에게 전송
+            simpMessagingTemplate.convertAndSend(
+                    "/user/" + message.getSender() + "/sub/chat/enter/" + message.getRoomId(),
+                    chatList
+            );
 
-        // 반환 결과를 세션에 userUUID로 저장
-        headerAccessor.getSessionAttributes().put("userUUID", userUUID);
-        headerAccessor.getSessionAttributes().put("roomId", chatDto.getRoomId());
+            log.info("지난 기록 전송했다! : {}", chatList);
+        } else {
+            log.info("구독합니다~");
+            memberChatRoomService.subscribe(member, chatRoom);
 
-        chatDto.setMessage(chatDto.getSender() + "님이 들어왔습니다.");
-        template.convertAndSend("/sub/chat/room/" + chatDto.getRoomId(), chatDto);
-    }
-
-    @MessageMapping("/chat/sendMessage")
-    public void sendMessage(@Payload ChatDto chatDto) {
-        log.info("CHAT {}", chatDto);
-        chatDto.setMessage(chatDto.getMessage());
-        template.convertAndSend("/sub/chat/room/" + chatDto.getRoomId(), chatDto);
-    }
-
-    // 사용자가 채팅방에서 퇴장하면 EventListener를 통해서 유저 퇴장을 확인한다.
-    @EventListener
-    public void webSocketDisconnectListener(SessionDisconnectEvent event) {
-        log.info("Disconnect {}", event);
-
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
-        // 채팅방에서 퇴장하면 STOMP 세션에 있던 UUID와 roomId를 확인해서
-        // 채팅방 유저 리스트와 Room에서 해당 유저를 삭제한다.
-        String userUUID = (String) headerAccessor.getSessionAttributes().get("userUUID");
-        String roomId = (String) headerAccessor.getSessionAttributes().get("roomId");
-
-        // 채팅방 유저에서 1명 줄이기
-        chatRepository.minusUserCount(roomId);
-
-        // 채팅방 유저 리스트에서 유저를 삭제.
-        chatRepository.deleteUser(roomId, userUUID);
-
-        String userName = chatRepository.getUserName(roomId, userUUID);
-        if (userName != null) {
-            log.info("User Disconnected : {}", userName);
-
-            ChatDto chat = ChatDto.builder()
-                    .type(MessageType.LEAVE)
-                    .sender(userName)
-                    .message(userName + "님이 나갔습니다.")
-                    .build();
-            template.convertAndSend("/sub/chat/room/" + roomId, chat);
+            // 입장 메시지 추가
+            Chat save = chatService.save(message, MessageType.ENTER);
+            ChatResDto enterNow = ChatResDto.convertToDto(save);
+            simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), enterNow);
         }
     }
 
-    // 채팅에 참여한 유저 리스트 반환
-    @GetMapping("/chat/userList")
-    @ResponseBody
-    public ArrayList<String> userList(String roomId) {
-        return chatRepository.getUserList(roomId);
+    @Operation(
+            summary = "사용자가 채팅룸은 나갔지만, 구독을 취소하지 않은 경우",
+            description = """
+                    - 구체적인 로직을 처리하지 않고, 요청 정보를 로그로 출력한다.
+                    """
+    )
+    @MessageMapping("/chat/out")
+    public void out(ChatReqDto message) {
+        log.info("out: {}", message);
     }
 
-    // 채팅에 참여하는 유저의 닉네임 중복 확인
-    @GetMapping("/chat/duplicateName")
-    @ResponseBody
-    public String isDuplicateName(@RequestParam("roomId") String roomId, @RequestParam("userName") String userName) {
-        String duplicateName = chatRepository.isDuplicateName(roomId, userName);
-        return duplicateName;
+    // 채팅룸을 나가면서 구독도 취소한 경우
+    @Operation(
+            summary = "사용자가 채팅방을 나가면서 해당 채팅방에 대한 구독도 취소하는 경우",
+            description = """
+                    - 사용자가 채팅방을 나갈 때, 사용자의 닉네임을 이용해서 사용자 정보를, 그리고 채팅방의 ID를 이용해서 채팅방 정보를 불러온다.
+                    - 사용자를 해당 채팅방에서 구독 해지시킨다.
+                    - 사용자 정보와 메시지 타입을 입력해서 채팅 메시지를 저장한다.
+                    - 저장된 메시지는 채팅방을 구독 중인 모든 사용자에게 convertAndSend를 통해서 전송한다.
+                    - 현재 채팅방에 아무도 없다면 채팅방을 삭제한다.
+                    """
+    )
+    @Transactional
+    @MessageMapping("/chat/subscribe/out")
+    public void subscribeOut(ChatReqDto message) {
+        log.info("out: {}", message);
+
+        Member member = memberService.findByNickname(message.getSender());
+        ChatRoom room = chatRoomService.findRoomByRoomId(message.getRoomId());
+
+        memberChatRoomService.unSubscribe(member, room);
+
+        message.setMessage(message.getSender() + "님이 퇴장했습니다.");
+        Chat exitChat = chatService.save(message, MessageType.EXIT);
+        ChatResDto chatResDto = ChatResDto.convertToDto(exitChat);
+
+        // 채팅룸에 아무도 없으면 해당 채팅룸은 모든 사용자가 나간 것으로 간주하고 삭제한다.
+        if (room.getCurrentSubscriber().isEmpty()) {
+            chatRoomService.deleteRoom(room);
+        }
+
+        simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
+    }
+
+    @Operation(
+            summary = "채팅 메시지를 전송할 때",
+            description = """
+            - 사용자가 채팅방에 메시지를 보낼 때 "/chat/send"라는 경로를 통해 메시지 요청이 들어오면 현재 메서드가 호출된다.
+            - 요청으로부터 채팅 메시지 정보가 담긴 ChatReqDto 객체를 받아 요청을 처리한다.
+            - 채팅 서비스에 메시지 정보와 메시지 유형(MessageType.CHAT)을 전달하여 새로운 채팅 메시지를 저장
+            - 저장된 채팅 메시지를 ChatResDto로 변환 후 채팅방의 모든 구독자에게 전송한다.
+            """
+    )
+    @MessageMapping("/chat/send")
+    public void sendMessage(ChatReqDto message) {
+        log.info("out: {}", message);
+        Chat createdChat = chatService.save(message, MessageType.CHAT);
+        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
+
+        simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
     }
 }

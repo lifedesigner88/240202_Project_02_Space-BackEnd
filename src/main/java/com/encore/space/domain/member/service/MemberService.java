@@ -11,13 +11,12 @@ import com.encore.space.domain.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 
 @Slf4j
 @Service
@@ -41,6 +40,10 @@ public class MemberService {
 
     public Member findById (Long id) throws EntityNotFoundException {
         return memberRepository.findById(id).orElseThrow(()->new EntityNotFoundException("존재하지 않는 아이디 입니다."));
+    }
+
+    public Member findByNickname (String nickname) throws EntityNotFoundException {
+        return memberRepository.findByNickname(nickname).orElseThrow(()->new EntityNotFoundException("존재하지 않는 닉네임 입니다."));
     }
 
     public Member findByEmail (String email) throws IllegalArgumentException {
@@ -82,4 +85,13 @@ public class MemberService {
             throw new IllegalArgumentException("인증번호가 다릅니다.");
         }
     }
+
+//    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null) {
+//            log.info("Security Context 정보 없음");
+//            return Optional.empty();
+//        }
+//
+//    }
 }
