@@ -30,7 +30,7 @@ public class HeartController {
     public ResponseEntity<CommonResponse> giveHeart(@RequestBody HeartReqDto heartReqDto,
                                                     @AuthenticationPrincipal CustomUserDetails userDetails){
         heartService.giveHeart(heartReqDto,userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.CREATED,
                 "좋아요!");
     }
@@ -43,7 +43,7 @@ public class HeartController {
     public ResponseEntity<CommonResponse> takeHeart(@RequestBody HeartReqDto heartReqDto,
                                                     @AuthenticationPrincipal CustomUserDetails userDetails){
         heartService.cancelHeart(heartReqDto, userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "좋아요가 취소되었습니다.");
     }
@@ -54,7 +54,7 @@ public class HeartController {
     )
     @GetMapping("/post/{postId}")
     public ResponseEntity<CommonResponse> postHearts(@PathVariable("postId") Long id){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "here are post hearts",
                 heartService.postHearts(id));
@@ -66,7 +66,7 @@ public class HeartController {
     )
     @GetMapping("/comment/{commentId}")
     public ResponseEntity<CommonResponse> commentHearts(@PathVariable("commentId") Long id){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "here are comment hearts",
                 heartService.commentHearts(id));

@@ -6,14 +6,10 @@ import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
 import com.encore.space.domain.member.dto.resdto.MemberResDto;
-import com.encore.space.domain.member.service.MemberService;
 import com.encore.space.domain.post.domain.Post;
 import com.encore.space.domain.post.dto.PostCreateDto;
 import com.encore.space.domain.post.dto.PostDetailResDto;
 import com.encore.space.domain.post.dto.PostListDto;
-import com.encore.space.domain.post.dto.PostUpdateDto;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import com.encore.space.domain.schedule.domain.KanBanStatus;
 import com.encore.space.domain.schedule.domain.Schedule;
 import com.encore.space.domain.schedule.dto.reqdto.CreateScheduleReqDto;
@@ -23,11 +19,11 @@ import com.encore.space.domain.space.domain.SpaceMember;
 import com.encore.space.domain.space.domain.SpaceType;
 import com.encore.space.domain.space.dto.reqdto.CreateSpaceReqDto;
 import com.encore.space.domain.space.dto.resdto.*;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -66,20 +62,22 @@ public class ChangeType {
     }
 
 
-    public Post postCreateDtoToPost(PostCreateDto postCreateDto,Member member){
+    public Post postCreateDtoToPost(PostCreateDto postCreateDto, Member member, Space space) {
+
         return Post.builder()
                 .title(postCreateDto.getTitle())
                 .contents(postCreateDto.getContents())
                 .member(member)
+                .space(space)
                 .build();
     }
 
-    public PostDetailResDto postToPostDetailResDto(Post post, Long postHearts){
+    public PostDetailResDto postToPostDetailResDto(Post post, Long postHearts) {
         List<String> filePath = new ArrayList<>();
         for (AttachFile a : post.getAttachFiles()) {
             filePath.add(a.getAttachFilePath());
         }
-        PostDetailResDto postDetailDto = PostDetailResDto.builder()
+        return PostDetailResDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .contents(post.getContents())
@@ -88,10 +86,9 @@ public class ChangeType {
                 .attachFiles(filePath)
                 .postHearts(postHearts)
                 .build();
-        return postDetailDto;
     }
 
-    public PostListDto postToPostListDto(Post post){
+    public PostListDto postToPostListDto(Post post) {
         PostListDto postListDto = PostListDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -101,6 +98,7 @@ public class ChangeType {
                 .postStatus(post.getPostStatus())
                 .build();
         return postListDto;
+    }
 
     //    스케쥴 관련
     public Schedule makeReqDtoTOschedule(CreateScheduleReqDto dto) {
@@ -197,8 +195,6 @@ public class ChangeType {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .contents(post.getContents())
-                .viewCount(post.getViewCount())
-                .likes(post.getLikes())
                 .build();
     }
 

@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Entity
@@ -29,20 +29,24 @@ public class Post extends BaseEntity {
     @ManyToOne
     @JoinColumn(name="member_id")
     private Member member;
+
     //게시글 공개여부
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PostStatus postStatus = PostStatus.OPEN;
+
     @Column
     @Builder.Default
     private String delYN="N";
     //첨부파일
     @OneToMany(mappedBy = "post")
     private List<AttachFile> attachFiles;
+
     //댓글
     @OneToMany(mappedBy = "post")
     private List<Comment> comment;
-    @ManyToOne   //  테스트를 위해 임시 추가(세종).
+
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Space space;
 

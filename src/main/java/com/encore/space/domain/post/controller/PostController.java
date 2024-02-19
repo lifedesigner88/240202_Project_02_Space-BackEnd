@@ -35,7 +35,7 @@ public class PostController {
     public ResponseEntity<CommonResponse> createPost(@ModelAttribute PostCreateDto postCreateDto,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails){
         postService.save(postCreateDto, userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.CREATED,
                 "게시글이 성공적으로 작성되었습니다.");
     }
@@ -46,7 +46,7 @@ public class PostController {
     )
     @GetMapping("/list")
     public ResponseEntity<CommonResponse> getPostList(){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "post list successfully loaded",
                 postService.findAll());
@@ -58,7 +58,7 @@ public class PostController {
     )
     @GetMapping("/detail/{post_id}")
     public ResponseEntity<CommonResponse> getPost(@PathVariable("post_id") Long id){
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "post successfully loaded",
                 postService.getPost(id));
@@ -73,7 +73,7 @@ public class PostController {
                                                      @ModelAttribute PostUpdateDto postUpdateDto,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
         postService.updatePost(id,postUpdateDto,userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "post successfully updated");
     }
@@ -86,7 +86,7 @@ public class PostController {
     public ResponseEntity<CommonResponse> delete (@PathVariable("postId") long id,
                                                  @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
         postService.delete(id,userDetails.getUsername());
-        return CommonResponse.responseMassage(
+        return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "post successfully deleted");
     }
