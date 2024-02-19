@@ -2,10 +2,18 @@ package com.encore.space.common.domain;
 
 
 import com.encore.space.common.config.PasswordConfig;
+import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
 import com.encore.space.domain.member.dto.resdto.MemberResDto;
+import com.encore.space.domain.member.service.MemberService;
 import com.encore.space.domain.post.domain.Post;
+import com.encore.space.domain.post.dto.PostCreateDto;
+import com.encore.space.domain.post.dto.PostDetailResDto;
+import com.encore.space.domain.post.dto.PostListDto;
+import com.encore.space.domain.post.dto.PostUpdateDto;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.encore.space.domain.schedule.domain.KanBanStatus;
 import com.encore.space.domain.schedule.domain.Schedule;
 import com.encore.space.domain.schedule.dto.reqdto.CreateScheduleReqDto;
@@ -15,8 +23,10 @@ import com.encore.space.domain.space.domain.SpaceMember;
 import com.encore.space.domain.space.domain.SpaceType;
 import com.encore.space.domain.space.dto.reqdto.CreateSpaceReqDto;
 import com.encore.space.domain.space.dto.resdto.*;
+
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +36,8 @@ public class ChangeType {
     // 시큐리티에 있는 것을 가져다 쓰면 순환 참조가 걸림 조심.
     private final PasswordConfig passwordConfig;
 
+
+    @Autowired
     public ChangeType(PasswordConfig passwordConfig) {
         this.passwordConfig = passwordConfig;
     }
@@ -52,6 +64,43 @@ public class ChangeType {
                 .loginType(memberReqDto.getLoginType())
                 .build();
     }
+
+
+    public Post postCreateDtoToPost(PostCreateDto postCreateDto,Member member){
+        return Post.builder()
+                .title(postCreateDto.getTitle())
+                .contents(postCreateDto.getContents())
+                .member(member)
+                .build();
+    }
+
+    public PostDetailResDto postToPostDetailResDto(Post post, Long postHearts){
+        List<String> filePath = new ArrayList<>();
+        for (AttachFile a : post.getAttachFiles()) {
+            filePath.add(a.getAttachFilePath());
+        }
+        PostDetailResDto postDetailDto = PostDetailResDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .contents(post.getContents())
+                .nickname(post.getMember().getNickname())
+                .postStatus(post.getPostStatus())
+                .attachFiles(filePath)
+                .postHearts(postHearts)
+                .build();
+        return postDetailDto;
+    }
+
+    public PostListDto postToPostListDto(Post post){
+        PostListDto postListDto = PostListDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .nickname(post.getMember().getNickname())
+                .createdTime(post.getCreated_at())
+                .updatedTime(post.getUpdated_at())
+                .postStatus(post.getPostStatus())
+                .build();
+        return postListDto;
 
     //    스케쥴 관련
     public Schedule makeReqDtoTOschedule(CreateScheduleReqDto dto) {
@@ -176,6 +225,7 @@ public class ChangeType {
                 .created_at(space.getCreated_at())
                 .updated_at(space.getUpdated_at())
                 .build();
+
     }
 
 
