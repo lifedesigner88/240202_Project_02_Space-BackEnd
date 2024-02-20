@@ -3,9 +3,7 @@ package com.encore.space.domain.post.service;
 import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.comment.domain.Comment;
 import com.encore.space.domain.comment.repository.CommentRepository;
-import com.encore.space.domain.comment.service.CommentService;
 import com.encore.space.domain.file.service.FileService;
-import com.encore.space.domain.hearts.repository.HeartRepository;
 import com.encore.space.domain.hearts.service.HeartService;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.domain.Role;
@@ -23,14 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -114,10 +109,10 @@ public class PostService {
         Member member = memberService.findByEmail(email);
         Post post = this.findByPostId(id);
         if (Objects.equals(member.getId(), post.getMember().getId())) {
-            post.updatePost(postUpdateDto.getTitle(), postUpdateDto.getContents(), postUpdateDto.getPostStatus());
             if (!postUpdateDto.getThumbnail().isEmpty()){
-                fileService.setThumbnail(postUpdateDto.getThumbnail(),post);
+                fileService.updateThumbnail(postUpdateDto.getThumbnail(),post);
             }
+            post.updatePost(postUpdateDto.getTitle(), postUpdateDto.getContents(), postUpdateDto.getPostStatus());
             if (!postUpdateDto.getAttachFileList().isEmpty()) {
                 fileService.uploadAttachFiles(postUpdateDto.getAttachFileList(), post);
             }

@@ -64,7 +64,7 @@ public class FileController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
-                .body(fileService.downloadFile(id,attachFile));
+                .body(fileService.downloadFile(attachFile));
     }
 }
 

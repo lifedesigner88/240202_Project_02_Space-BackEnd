@@ -4,7 +4,6 @@ import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.file.repository.FileRepository;
 import com.encore.space.domain.post.domain.Post;
-import com.encore.space.domain.post.repository.PostRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,9 +34,6 @@ public class FileService {
 
     //썸네일 업로드
     public void setThumbnail(MultipartFile thumbnail,Post post){
-        if(!post.getThumbnail().isEmpty()){
-            post.setThumbnail("");
-        }
         UUID uuid = UUID.randomUUID();
         String thumbnailFileName = uuid + "_thumbnail_" + thumbnail.getOriginalFilename();
         Path thumbnailPath = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", thumbnailFileName);
@@ -49,6 +44,17 @@ public class FileService {
             post.setThumbnail(thumbnailPath.toString());
         } catch (IOException e) {
             throw new IllegalArgumentException("image not available");
+        }
+    }
+
+    public void updateThumbnail(MultipartFile thumbnail,Post post){
+        if(!post.getThumbnail().isEmpty()){
+            AttachFile oldThumb= fileRepository.findByAttachFilePath(post.getThumbnail());
+            oldThumb.delete();
+            post.deleteThumbnail();
+            this.setThumbnail(thumbnail,post);
+        } else {
+            this.setThumbnail(thumbnail, post);
         }
     }
 
@@ -70,12 +76,11 @@ public class FileService {
 
     //파일 목록 조회
     public List<AttachFile> getFileList(Long postId) {
-        List<AttachFile> attachFiles = fileRepository.findAllByPostId(postId);
-        return attachFiles;
+        return fileRepository.findAllByPostId(postId);
     }
 
     //파일 다운로드
-    public Resource downloadFile(Long fileId, AttachFile attachFile) throws IOException {
+    public Resource downloadFile(AttachFile attachFile) throws IOException {
         if(attachFile.getDelYN().equals("Y")){
             throw new EntityNotFoundException("이미 삭제된 파일입니다.");
         } else {

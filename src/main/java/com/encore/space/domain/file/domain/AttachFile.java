@@ -32,7 +32,6 @@ public class AttachFile extends BaseEntity {
     @Builder.Default
     private String delYN = "N";
 
-
     public void delete(){
         this.delYN="Y";
     }

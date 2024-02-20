@@ -58,7 +58,10 @@ public class Post extends BaseEntity {
     public void deletePost(){
         this.delYN="Y";
     }
-  
+
+    public void deleteThumbnail(){
+        this.thumbnail=null;
+    }
 }
 
 
