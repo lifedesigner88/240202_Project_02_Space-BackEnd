@@ -115,6 +115,7 @@ public class JwtProvider {
         return accessToken;
     }
 
+
     public String reExportToken(String email, String role, String accessToken, String refreshToken){
         String newAccessToken = this.createAccessToken(
                 email, role
@@ -123,6 +124,7 @@ public class JwtProvider {
         long ttl = jedis.ttl(accessToken);
         redisTemplate.delete(accessToken);
         redisTemplate.opsForValue().set(newAccessToken, refreshToken, ttl, TimeUnit.SECONDS);
+
         return  newAccessToken;
     }
 }
