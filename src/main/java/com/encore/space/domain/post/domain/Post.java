@@ -26,15 +26,13 @@ public class Post extends BaseEntity {
     @ManyToOne
     @JoinColumn(name="member_id")
     private Member member;
-
     //게시글 공개여부
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PostStatus postStatus = PostStatus.OPEN;
     @Column
     @Setter
-    @Builder.Default
-    private String thumbnail= "C://Users//Playdata//Desktop//project//Space-BackEnd//src//main//resources//static//images//thumnailTest.jpg";
+    private String thumbnail;
     @Column
     @Builder.Default
     private String delYN="N";

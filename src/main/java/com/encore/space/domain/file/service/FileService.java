@@ -36,9 +36,12 @@ public class FileService {
 
     //썸네일 업로드
     public void setThumbnail(MultipartFile thumbnail,Post post){
+        if(!post.getThumbnail().isEmpty()){
+            post.setThumbnail("");
+        }
         UUID uuid = UUID.randomUUID();
         String thumbnailFileName = uuid + "_thumbnail_" + thumbnail.getOriginalFilename();
-        Path thumbnailPath = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", thumbnailFileName);        //게시판 ID 값 뒤에 붙여보기
+        Path thumbnailPath = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", thumbnailFileName);
         try {
             byte[] bytes = thumbnail.getBytes();
             Files.write(thumbnailPath, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);

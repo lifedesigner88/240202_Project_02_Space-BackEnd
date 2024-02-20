@@ -115,7 +115,9 @@ public class PostService {
         Post post = this.findByPostId(id);
         if (Objects.equals(member.getId(), post.getMember().getId())) {
             post.updatePost(postUpdateDto.getTitle(), postUpdateDto.getContents(), postUpdateDto.getPostStatus());
-//
+            if (!postUpdateDto.getThumbnail().isEmpty()){
+                fileService.setThumbnail(postUpdateDto.getThumbnail(),post);
+            }
             if (!postUpdateDto.getAttachFileList().isEmpty()) {
                 fileService.uploadAttachFiles(postUpdateDto.getAttachFileList(), post);
             }

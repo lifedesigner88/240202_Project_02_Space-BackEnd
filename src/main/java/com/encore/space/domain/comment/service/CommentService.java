@@ -1,6 +1,5 @@
 package com.encore.space.domain.comment.service;
 
-
 import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.comment.domain.Comment;
 import com.encore.space.domain.comment.dto.CommentChildrenListDto;
@@ -8,13 +7,11 @@ import com.encore.space.domain.comment.dto.CommentCreateDto;
 import com.encore.space.domain.comment.dto.CommentResDto;
 import com.encore.space.domain.comment.dto.CommentUpdateDto;
 import com.encore.space.domain.comment.repository.CommentRepository;
-import com.encore.space.domain.hearts.repository.HeartRepository;
 import com.encore.space.domain.hearts.service.HeartService;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.domain.Role;
 import com.encore.space.domain.member.service.MemberService;
 import com.encore.space.domain.post.domain.Post;
-import com.encore.space.domain.post.repository.PostRepository;
 import com.encore.space.domain.post.service.PostService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,7 @@ public class CommentService {
     private final MemberService memberService;
     private final HeartService heartService;
     private final ChangeType changeType;
+
     @Autowired
     public CommentService(CommentRepository commentRepository,
                           PostService postService,
@@ -105,8 +103,9 @@ public class CommentService {
         Comment comment = this.findByCommentId(commentId);
         if(!Objects.equals(member.getId(), comment.getMember().getId())){
             throw new AccessDeniedException ("권한이 없습니다.");
+        } else {
+            comment.updateComment(commentUpdateDto.getContent());
         }
-        comment.updateComment(commentUpdateDto.getContents());
     }
 
 
@@ -126,4 +125,5 @@ public class CommentService {
             throw new AccessDeniedException("권한이 없습니다.");
         }
     }
+
 }
