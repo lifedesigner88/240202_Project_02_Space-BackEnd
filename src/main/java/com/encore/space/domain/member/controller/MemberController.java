@@ -103,7 +103,7 @@ public class MemberController {
             summary = "일반 로그인 test",
             description = "이메일과 패스워드를 받아 로그인 test"
     )
-    @PreAuthorize("hasAnyRole('MANAGER')")
+//    @PreAuthorize("hasAnyRole('MANAGER')")
     @PostMapping("/qwe")
     public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
         return "ok" + userDetails.getUsername() ;

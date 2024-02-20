@@ -115,7 +115,7 @@ public class JwtProvider {
         return accessToken;
     }
 
-    public Map<String, Object> reExportToken(String email, String role, String accessToken, String refreshToken){
+    public String reExportToken(String email, String role, String accessToken, String refreshToken){
         String newAccessToken = this.createAccessToken(
                 email, role
         );
@@ -123,9 +123,6 @@ public class JwtProvider {
         long ttl = jedis.ttl(accessToken);
         redisTemplate.delete(accessToken);
         redisTemplate.opsForValue().set(newAccessToken, refreshToken, ttl, TimeUnit.SECONDS);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("accessToken", newAccessToken);
-        return  map;
+        return  newAccessToken;
     }
 }
