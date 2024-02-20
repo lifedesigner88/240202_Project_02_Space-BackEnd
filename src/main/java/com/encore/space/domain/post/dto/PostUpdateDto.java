@@ -11,6 +11,7 @@ import java.util.List;
 public class PostUpdateDto {
     private String title;
     private String contents;
+    private MultipartFile thumbnail;
     private PostStatus postStatus;
     private List<MultipartFile> attachFileList;
 }

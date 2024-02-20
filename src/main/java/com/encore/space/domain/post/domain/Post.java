@@ -6,10 +6,7 @@ import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.space.domain.Space;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -34,7 +31,10 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PostStatus postStatus = PostStatus.OPEN;
-
+    @Column
+    @Setter
+    @Builder.Default
+    private String thumbnail= "C://Users//Playdata//Desktop//project//Space-BackEnd//src//main//resources//static//images//thumnailTest.jpg";
     @Column
     @Builder.Default
     private String delYN="N";

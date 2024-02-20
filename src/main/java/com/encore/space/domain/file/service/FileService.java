@@ -1,5 +1,6 @@
 package com.encore.space.domain.file.service;
 
+import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.file.repository.FileRepository;
 import com.encore.space.domain.post.domain.Post;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,38 +26,42 @@ import java.util.UUID;
 @Transactional
 public class FileService {
     private final FileRepository fileRepository;
-    private final PostRepository postRepository;
+    private final ChangeType changeType;
 
     @Autowired
-    public FileService(FileRepository fileRepository, PostRepository postRepository) {
+    public FileService(FileRepository fileRepository, ChangeType changeType) {
         this.fileRepository = fileRepository;
-        this.postRepository = postRepository;
+        this.changeType = changeType;
     }
 
+    //썸네일 업로드
+    public void setThumbnail(MultipartFile thumbnail,Post post){
+        UUID uuid = UUID.randomUUID();
+        String thumbnailFileName = uuid + "_thumbnail_" + thumbnail.getOriginalFilename();
+        Path thumbnailPath = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", thumbnailFileName);        //게시판 ID 값 뒤에 붙여보기
+        try {
+            byte[] bytes = thumbnail.getBytes();
+            Files.write(thumbnailPath, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+            fileRepository.save(changeType.toAttachFile(thumbnail,post,thumbnailPath));
+            post.setThumbnail(thumbnailPath.toString());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("image not available");
+        }
+    }
 
     //첨부파일 업로드
     public void uploadAttachFiles(List<MultipartFile> attachFileList, Post post) throws EntityNotFoundException, IllegalArgumentException {
-
         for (MultipartFile multipartFile : attachFileList) {
             UUID uuid = UUID.randomUUID();
             String attachFileName = uuid + "_" + multipartFile.getOriginalFilename();
-            Long attachFileSize = multipartFile.getSize();
             Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
-
             try {
                 byte[] bytes = multipartFile.getBytes();
                 Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             } catch (IOException e) {
-                throw new IllegalArgumentException("image not available");
+                throw new IllegalArgumentException("file not available");
             }
-
-            AttachFile attachFile = AttachFile.builder()
-                    .post(post)
-                    .attachFileName(multipartFile.getOriginalFilename())
-                    .fileSize(attachFileSize)
-                    .attachFilePath(path.toString())
-                    .build();
-            fileRepository.save(attachFile);
+            fileRepository.save(changeType.toAttachFile(multipartFile,post,path));
         }
     }
 
@@ -72,8 +78,7 @@ public class FileService {
         } else {
             String attachFilePath = attachFile.getAttachFilePath();
             Path path = Paths.get(attachFilePath);
-            Resource resource = new org.springframework.core.io.ByteArrayResource(Files.readAllBytes(path));
-            return resource;
+            return new org.springframework.core.io.ByteArrayResource(Files.readAllBytes(path));
         }
     }
 
