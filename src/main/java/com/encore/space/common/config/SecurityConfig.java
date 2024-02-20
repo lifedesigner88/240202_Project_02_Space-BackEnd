@@ -110,8 +110,6 @@ public class SecurityConfig {
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",
 
-            // 테스트용
-            "/api/member/qwe",
     };
 
     private static final String[] LoginApiUrl = {
