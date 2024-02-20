@@ -70,6 +70,9 @@ public class MemberService {
         if(!emailService.isValidEmail(emailReqDto.getEmail())){
             throw new IllegalArgumentException("이메일 형식을 확인해 주세요.");
         }
+        if(this.existsByEmail(emailReqDto.getEmail())){
+            throw new DataIntegrityViolationException("이미 가입된 이메일입니다. 다른 이메일을 이용하세요.");
+        }
 
         String number = emailService.makeRandomCode(emailReqDto.getEmail());
         emailService.SendEmail(
