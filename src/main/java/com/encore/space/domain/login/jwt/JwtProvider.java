@@ -101,7 +101,7 @@ public class JwtProvider {
                 .getBody();
     }
 
-    public Map<String, Object> exportToken(String email, String role, String clientIP){
+    public String exportToken(String email, String role, String clientIP){
         String accessToken = this.createAccessToken(
                 email, role
         );
@@ -111,9 +111,8 @@ public class JwtProvider {
         );
         redisTemplate.opsForValue().set(accessToken, refreshToken, refreshTokenTime, TimeUnit.DAYS);
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("accessToken", accessToken);
-        return  map;
+
+        return accessToken;
     }
 
     public Map<String, Object> reExportToken(String email, String role, String accessToken, String refreshToken){
