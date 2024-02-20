@@ -11,12 +11,15 @@ import com.encore.space.domain.member.repository.MemberRepository;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -84,6 +87,14 @@ public class MemberService {
         if(!emailService.VerificationCode(emailCodeReqDto.getEmail(), emailCodeReqDto.getCode())){
             throw new IllegalArgumentException("인증번호가 다릅니다.");
         }
+    }
+
+//    세종 만듬
+    public List<MemberResDto> findAllMembers() {
+        return memberRepository.findAll()
+                .stream()
+                .map(changeType::memberTOmemberResDto)
+                .collect(Collectors.toList());
     }
 
 //    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {
