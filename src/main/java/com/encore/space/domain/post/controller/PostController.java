@@ -34,6 +34,7 @@ public class PostController {
     @PostMapping("/create")
     public ResponseEntity<CommonResponse> createPost(@ModelAttribute PostCreateDto postCreateDto,
                                                      @AuthenticationPrincipal CustomUserDetails userDetails){
+
         postService.save(postCreateDto, userDetails.getUsername());
         return CommonResponse.responseMessage(
                 HttpStatus.CREATED,

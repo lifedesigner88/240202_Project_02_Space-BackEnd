@@ -21,7 +21,7 @@ public class Post extends BaseEntity {
     private Long id;
     @Column(length = 50, nullable = false)
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String contents;
     @ManyToOne
     @JoinColumn(name="member_id")
