@@ -4,7 +4,6 @@ import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.comment.domain.Comment;
 import com.encore.space.domain.comment.repository.CommentRepository;
 import com.encore.space.domain.file.service.FileService;
-import com.encore.space.domain.hearts.HeartRepository;
 import com.encore.space.domain.hearts.service.HeartService;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.domain.Role;
@@ -23,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,16 +38,15 @@ public class PostService {
     private final MemberService memberService;
     private final SpaceService spaceService;
     private final CommentRepository commentRepository;
-    private final HeartRepository heartRepository;
     private final ChangeType changeType;
 
     @Autowired
     public PostService(PostRepository postRepository,
                        FileService fileService,
                        HeartService heartService,
-                       MemberService memberService, SpaceService spaceService,
+                       MemberService memberService,
+                       SpaceService spaceService,
                        CommentRepository commentRepository,
-                       HeartRepository heartRepository,
                        ChangeType changeType) {
         this.postRepository = postRepository;
         this.fileService = fileService;
@@ -56,23 +54,32 @@ public class PostService {
         this.memberService = memberService;
         this.spaceService = spaceService;
         this.commentRepository = commentRepository;
-        this.heartRepository = heartRepository;
         this.changeType = changeType;
     }
 
     //게시글 가져오기
     public Post findByPostId(Long postId) throws EntityNotFoundException {
         Post post = postRepository.findById(postId).orElseThrow(EntityNotFoundException::new);
+        if(post.getDelYN().equals("Y")){
+            throw new EntityNotFoundException("삭제된 게시글입니다.");
+        }
         return post;
     }
+
+    public List<Post> getPosts(){
+        return postRepository.findAll();
+    }
+
 
     //게시글 저장 with 이미지파일(첨부파일)
     public void save(PostCreateDto postCreateDto, String email) throws EntityNotFoundException {
         Member member = memberService.findByEmail(email);
         Space space = spaceService.findSpaceBySapceId(postCreateDto.getSpaceId());
-        Post post = postRepository.save(changeType.postCreateDtoToPost(
-                postCreateDto, member, space));
-        if (!postCreateDto.getAttachFileList().isEmpty()) {
+        Post post = postRepository.save(changeType.postCreateDtoTOPost(postCreateDto, member, space));
+        if (!postCreateDto.getThumbnail().isEmpty()){
+            fileService.setThumbnail(postCreateDto.getThumbnail(),post);
+        }
+        if (postCreateDto.getAttachFileList().isEmpty()) {
             fileService.uploadAttachFiles(postCreateDto.getAttachFileList(), post);
         }
     }
@@ -81,32 +88,31 @@ public class PostService {
     public PostDetailResDto getPost(Long postId) throws EntityNotFoundException {
         Post post = this.findByPostId(postId);
         Long postHearts = heartService.postHearts(postId);
-        if (post.getDelYN().equals("Y")) {
-            throw new EntityNotFoundException("삭제된 게시글입니다.");
-        } else {
-            return changeType.postToPostDetailResDto(post, postHearts);
-        }
+        int commentCounts= commentRepository.findAllByPostId(postId).size();
+        return changeType.postTOPostDetailResDto(post, postHearts, commentCounts);
     }
 
-    //게시글 목록 조회    --> 상의
+    //게시글 목록 조회
     public List<PostListDto> findAll() {
         List<PostListDto> postListDtoList = new ArrayList<>();
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts= this.getPosts();
         for (Post p : posts) {
             if (p.getDelYN().equals("N")) {
-                changeType.postToPostListDto(p);
+                postListDtoList.add(changeType.postTOPostListDto(p));
             }
         }
         return postListDtoList;
     }
 
     //게시글 수정
-    public void updatePost(Long id, PostUpdateDto postUpdateDto, String email) throws EntityNotFoundException, AccessDeniedException {
+    public void updatePost(Long id, PostUpdateDto postUpdateDto, String email) throws AccessDeniedException {
         Member member = memberService.findByEmail(email);
-        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("작성하신 글이 없습니다."));
+        Post post = this.findByPostId(id);
         if (Objects.equals(member.getId(), post.getMember().getId())) {
+            if (!postUpdateDto.getThumbnail().isEmpty()){
+                fileService.updateThumbnail(postUpdateDto.getThumbnail(),post);
+            }
             post.updatePost(postUpdateDto.getTitle(), postUpdateDto.getContents(), postUpdateDto.getPostStatus());
-            postRepository.save(post);
             if (!postUpdateDto.getAttachFileList().isEmpty()) {
                 fileService.uploadAttachFiles(postUpdateDto.getAttachFileList(), post);
             }
@@ -118,13 +124,13 @@ public class PostService {
     //게시글 삭제
     public void delete(Long postId, String email) throws EntityNotFoundException, AccessDeniedException {
         Member member = memberService.findByEmail(email);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시물입니다."));
-        if (member.getId() == post.getMember().getId() || member.getRole().equals(Role.MANAGER) || member.getRole().equals(Role.TEACHER)) {
+        Post post = this.findByPostId(postId);
+        if (Objects.equals(member.getId(), post.getMember().getId()) || member.getRole().equals(Role.MANAGER) || member.getRole().equals(Role.TEACHER)) {
             List<Comment> postComment = commentRepository.findAllByPostId(postId);
             for (Comment c : postComment) {
                 c.delete();
             }
-            heartService.deleteHearts(heartRepository.findByPostId(postId));
+            heartService.deleteHearts(heartService.getPostHearts(postId));
             post.deletePost();
         } else {
             throw new AccessDeniedException("권한이 없습니다.");

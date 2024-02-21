@@ -15,6 +15,7 @@ public class PostCreateDto {
     private String title;
     private String contents;
     private PostStatus postStatus;
+    private MultipartFile thumbnail;
     private List<MultipartFile> attachFileList;
     private Long spaceId;
 }
