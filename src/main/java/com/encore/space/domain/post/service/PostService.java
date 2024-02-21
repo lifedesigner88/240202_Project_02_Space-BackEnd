@@ -79,7 +79,7 @@ public class PostService {
         if (!postCreateDto.getThumbnail().isEmpty()){
             fileService.setThumbnail(postCreateDto.getThumbnail(),post);
         }
-        if (!postCreateDto.getAttachFileList().isEmpty()) {
+        if (postCreateDto.getAttachFileList().isEmpty()) {
             fileService.uploadAttachFiles(postCreateDto.getAttachFileList(), post);
         }
     }

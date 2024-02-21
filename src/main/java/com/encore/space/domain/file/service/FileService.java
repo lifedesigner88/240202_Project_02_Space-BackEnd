@@ -61,16 +61,19 @@ public class FileService {
     //첨부파일 업로드
     public void uploadAttachFiles(List<MultipartFile> attachFileList, Post post) throws EntityNotFoundException, IllegalArgumentException {
         for (MultipartFile multipartFile : attachFileList) {
-            UUID uuid = UUID.randomUUID();
-            String attachFileName = uuid + "_" + multipartFile.getOriginalFilename();
-            Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
             try {
-                byte[] bytes = multipartFile.getBytes();
-                Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                if(multipartFile.getOriginalFilename().isEmpty()){
+                    UUID uuid = UUID.randomUUID();
+                    String attachFileName = uuid + "_" + multipartFile.getOriginalFilename();
+                    Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
+
+                    byte[] bytes = multipartFile.getBytes();
+                    Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                    fileRepository.save(changeType.toAttachFile(multipartFile,post,path));
+                }
             } catch (IOException e) {
                 throw new IllegalArgumentException("file not available");
             }
-            fileRepository.save(changeType.toAttachFile(multipartFile,post,path));
         }
     }
 
