@@ -76,10 +76,9 @@ public class PostService {
         Member member = memberService.findByEmail(email);
         Space space = spaceService.findSpaceBySapceId(postCreateDto.getSpaceId());
         Post post = postRepository.save(changeType.postCreateDtoTOPost(postCreateDto, member, space));
-        if (!postCreateDto.getThumbnail().isEmpty()){
-            fileService.setThumbnail(postCreateDto.getThumbnail(),post);
-        }
-        if (postCreateDto.getAttachFileList().isEmpty()) {
+
+        if (!postCreateDto.getAttachFileList().isEmpty()) {
+            fileService.setThumbnail(postCreateDto.getAttachFileList().get(0),post);
             fileService.uploadAttachFiles(postCreateDto.getAttachFileList(), post);
         }
     }

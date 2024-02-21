@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,7 +16,6 @@ public class PostCreateDto {
     private String title;
     private String contents;
     private PostStatus postStatus;
-    private MultipartFile thumbnail;
-    private List<MultipartFile> attachFileList;
+    private List<MultipartFile> attachFileList = new ArrayList<>();
     private Long spaceId;
 }
