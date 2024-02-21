@@ -48,7 +48,7 @@ public class FileService {
     }
 
     public void updateThumbnail(MultipartFile thumbnail,Post post){
-        if(!post.getThumbnail().isEmpty()){
+        if(post.getThumbnail()!=null){
             AttachFile oldThumb= fileRepository.findByAttachFilePath(post.getThumbnail());
             oldThumb.delete();
             post.deleteThumbnail();
