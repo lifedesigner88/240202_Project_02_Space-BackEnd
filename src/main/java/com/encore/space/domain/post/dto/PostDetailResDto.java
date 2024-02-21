@@ -21,5 +21,6 @@ public class PostDetailResDto {
     private int commentCounts;
     private String thumbnail;
     private List<String> attachFiles;
-    private Space space;
+    private String spaceName;
+    private String spaceType;
 }
