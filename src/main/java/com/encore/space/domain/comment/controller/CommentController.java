@@ -42,7 +42,6 @@ public class CommentController {
                 "comment successfully created");
     }
 
-    //로그인 하고나서만 되는데..
     @Operation(
             summary = "댓글 목록 조회",
             description = "댓글 목록"
@@ -73,10 +72,10 @@ public class CommentController {
             description = "댓글, 대댓글 수정"
     )
     @PostMapping("/update/{commentId}")
-    public ResponseEntity<CommonResponse> updateComment(@PathVariable("commentId") Long id,
+    public ResponseEntity<CommonResponse> updateComment(@PathVariable("commentId") Long commentId,
                                                         @RequestBody CommentUpdateDto commentUpdateDto,
                                                         @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
-        commentService.update(id, commentUpdateDto, userDetails.getUsername());
+        commentService.update(commentId, userDetails.getUsername(),commentUpdateDto);
         return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 "comment successfully updated");

@@ -6,10 +6,7 @@ import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.space.domain.Space;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -24,17 +21,18 @@ public class Post extends BaseEntity {
     private Long id;
     @Column(length = 50, nullable = false)
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String contents;
     @ManyToOne
     @JoinColumn(name="member_id")
     private Member member;
-
     //게시글 공개여부
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private PostStatus postStatus = PostStatus.OPEN;
-
+    @Column
+    @Setter
+    private String thumbnail;
     @Column
     @Builder.Default
     private String delYN="N";
@@ -60,7 +58,10 @@ public class Post extends BaseEntity {
     public void deletePost(){
         this.delYN="Y";
     }
-  
+
+    public void deleteThumbnail(){
+        this.thumbnail=null;
+    }
 }
 
 
