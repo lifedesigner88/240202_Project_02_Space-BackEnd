@@ -3,11 +3,14 @@ package com.encore.space.domain.chat.controller;
 import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.chat.domain.ChatRoom;
 import com.encore.space.domain.chat.dto.ChatRoomDetailDto;
+import com.encore.space.domain.chat.dto.ChatRoomSearchDto;
 import com.encore.space.domain.chat.service.ChatRoomService;
 import com.encore.space.domain.login.domain.CustomUserDetails;
 import com.encore.space.domain.member.service.MemberService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,24 +28,49 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final MemberService memberService;
 
-    @GetMapping("/chat/room")
-    public ResponseEntity<CommonResponse> findAllRooms() {
+    /**
+     * 이거 쓰셈!!! 다른 것 사용안함!!
+     * @param chatRoomSearchDto
+     * @param pageable
+     * @return
+     */
+    @GetMapping("chat/rooms")
+    public ResponseEntity<CommonResponse> findChatRooms(ChatRoomSearchDto chatRoomSearchDto, Pageable pageable) {
+        List<ChatRoomDetailDto> chatRoomDetailDtos = chatRoomService.findAll(chatRoomSearchDto, pageable);
         return CommonResponse.responseMessage(
                 HttpStatus.OK,
-                "전체 채팅룸 검색 성공",
-                chatRoomService.findAllRoom()
+                "채팅룸 검색 성공",
+                chatRoomDetailDtos
         );
     }
 
+//    @GetMapping("/chat/room")
+//    public ResponseEntity<CommonResponse> findAllRooms() {
+//        return CommonResponse.responseMessage(
+//                HttpStatus.OK,
+//                "전체 채팅룸 검색 성공",
+//                chatRoomService.findAllRoom()
+//        );
+//    }
+
     // ChatRoomDetailDto 반환하도록 수정할 것.
-    @GetMapping("/chat/room/{roomId}")
-    public ResponseEntity<CommonResponse> findRoomById(@PathVariable("roomId") String roomId) {
-        return CommonResponse.responseMessage(
-                HttpStatus.OK,
-                "채팅룸 id=" + roomId + " 검색 성공",
-                chatRoomService.findRoomByRoomId(roomId)
-        );
-    }
+//    @GetMapping("/chat/room/roomid/{roomId}")
+//    public ResponseEntity<CommonResponse> findRoomById(@PathVariable("roomId") String roomId) {
+//        return CommonResponse.responseMessage(
+//                HttpStatus.OK,
+//                "채팅룸 id=" + roomId + " 검색 성공",
+//                chatRoomService.findRoomByRoomId(roomId)
+//        );
+//    }
+
+//    @GetMapping("/chat/room/roomname/{roomName}")
+//    public ResponseEntity<CommonResponse> findRoomByName(@PathVariable("roomName") String roomName) {
+//        return CommonResponse.responseMessage(
+//                HttpStatus.OK,
+//                "채팅룸 roomName=" + roomName,
+//                chatRoomService.findRoomByRoomName(roomName)
+//        );
+//    }
 
     @PostMapping("/chat/room/{name}")
     public ResponseEntity<CommonResponse> createRoom(
@@ -58,7 +86,6 @@ public class ChatRoomController {
         );
     }
 
-    // Admin 권한에서만 삭제 가능하도록 수정
     @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/chat/room/{roomId}")
     public ResponseEntity<CommonResponse> deleteRoom(@PathVariable("roomId") String roomId) {
