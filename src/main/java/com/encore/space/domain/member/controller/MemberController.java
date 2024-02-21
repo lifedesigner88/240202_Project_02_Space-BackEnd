@@ -103,9 +103,17 @@ public class MemberController {
             summary = "일반 로그인 test",
             description = "이메일과 패스워드를 받아 로그인 test"
     )
-    @PreAuthorize("hasAnyRole('MANAGER')")
+
+//    @PreAuthorize("hasAnyRole('MANAGER')")
+
     @PostMapping("/qwe")
     public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
         return "ok" + userDetails.getUsername() ;
+    }
+
+//    세종 임시로 만듬 (스페이스 초대용)
+    @GetMapping("/members")
+        public ResponseEntity<CommonResponse> findAllMembers () {
+        return CommonResponse.responseMessage(HttpStatus.OK, "모든 회원 조회", memberService.findAllMembers());
     }
 }

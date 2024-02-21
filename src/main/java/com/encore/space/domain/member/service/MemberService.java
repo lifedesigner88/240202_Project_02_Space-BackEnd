@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,6 +43,10 @@ public class MemberService {
 
     public Member findById (Long id) throws EntityNotFoundException {
         return memberRepository.findById(id).orElseThrow(()->new EntityNotFoundException("존재하지 않는 아이디 입니다."));
+    }
+
+    public Member findByNickname (String nickname) throws EntityNotFoundException {
+        return memberRepository.findByNickname(nickname).orElseThrow(()->new EntityNotFoundException("존재하지 않는 닉네임 입니다."));
     }
 
     public Member findByEmail (String email) throws IllegalArgumentException {
@@ -67,6 +73,9 @@ public class MemberService {
         if(!emailService.isValidEmail(emailReqDto.getEmail())){
             throw new IllegalArgumentException("이메일 형식을 확인해 주세요.");
         }
+        if(this.existsByEmail(emailReqDto.getEmail())){
+            throw new DataIntegrityViolationException("이미 가입된 이메일입니다. 다른 이메일을 이용하세요.");
+        }
 
         String number = emailService.makeRandomCode(emailReqDto.getEmail());
         emailService.SendEmail(
@@ -82,4 +91,21 @@ public class MemberService {
             throw new IllegalArgumentException("인증번호가 다릅니다.");
         }
     }
+
+//    세종 만듬
+    public List<MemberResDto> findAllMembers() {
+        return memberRepository.findAll()
+                .stream()
+                .map(changeType::memberTOmemberResDto)
+                .collect(Collectors.toList());
+    }
+
+//    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null) {
+//            log.info("Security Context 정보 없음");
+//            return Optional.empty();
+//        }
+//
+//    }
 }
