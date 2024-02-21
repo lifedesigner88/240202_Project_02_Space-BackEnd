@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface FileRepository extends JpaRepository<AttachFile, Long> {
-
+    AttachFile findByAttachFilePath (String path);
     List<AttachFile> findAllByPostId (Long postId);
 }

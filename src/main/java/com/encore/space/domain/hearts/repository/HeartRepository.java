@@ -1,4 +1,4 @@
-package com.encore.space.domain.hearts;
+package com.encore.space.domain.hearts.repository;
 
 import com.encore.space.domain.comment.domain.Comment;
 import com.encore.space.domain.hearts.domain.Heart;
