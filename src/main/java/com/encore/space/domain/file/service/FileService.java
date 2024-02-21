@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 @Slf4j
 @Service
@@ -62,7 +63,7 @@ public class FileService {
     public void uploadAttachFiles(List<MultipartFile> attachFileList, Post post) throws EntityNotFoundException, IllegalArgumentException {
         for (MultipartFile multipartFile : attachFileList) {
             try {
-                if(multipartFile.getOriginalFilename().isEmpty()){
+                if(!Objects.requireNonNull(multipartFile.getOriginalFilename()).isEmpty()){
                     UUID uuid = UUID.randomUUID();
                     String attachFileName = uuid + "_" + multipartFile.getOriginalFilename();
                     Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
