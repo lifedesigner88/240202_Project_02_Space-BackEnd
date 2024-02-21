@@ -110,4 +110,10 @@ public class MemberController {
     public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
         return "ok" + userDetails.getUsername() ;
     }
+
+//    세종 임시로 만듬 (스페이스 초대용)
+    @GetMapping("/members")
+        public ResponseEntity<CommonResponse> findAllMembers () {
+        return CommonResponse.responseMessage(HttpStatus.OK, "모든 회원 조회", memberService.findAllMembers());
+    }
 }
