@@ -5,6 +5,7 @@ import com.encore.space.domain.chat.dto.ChatResDto;
 import com.encore.space.domain.chat.dto.ChatRoomCreateDto;
 import com.encore.space.domain.chat.dto.ChatRoomDetailDto;
 import com.encore.space.domain.chat.dto.ChatRoomSearchDto;
+import com.encore.space.domain.chat.dto.MemberChatRoomDto;
 import com.encore.space.domain.chat.repository.ChatRoomRepository;
 import com.encore.space.domain.member.domain.Member;
 import jakarta.persistence.EntityNotFoundException;
@@ -116,4 +117,13 @@ public class ChatRoomService {
     public ChatRoomDetailDto findRoomIdChatList(String roomId) {
         return ChatRoomDetailDto.createRoom(findRoomByRoomId(roomId));
     }
+
+    public List<MemberChatRoomDto> findSubscribersByRoomId(String roomId) {
+        ChatRoom chatRoom = findRoomByRoomId(roomId);
+
+        return chatRoom.getCurrentSubscriber().stream()
+                .map(MemberChatRoomDto::new)
+                .collect(Collectors.toList());
+    }
+
 }

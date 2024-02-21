@@ -11,12 +11,11 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-//    @Autowired
-//    private StompHandler stompHandler;  // JWT 인증 관련
+
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/sub", "/user");
+        registry.enableSimpleBroker("/sub");
         registry.setApplicationDestinationPrefixes("/pub");
         registry.setUserDestinationPrefix("/user");
     }
@@ -24,14 +23,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:8080", "http://localhost:8081")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
-
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(stompHandler);
-//    }
 
     /**
      * 메시지 크기 제한을 통해서 클라이언트의 악의적인 요청을 차단

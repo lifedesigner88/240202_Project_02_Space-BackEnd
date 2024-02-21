@@ -109,6 +109,7 @@ public class SecurityConfig {
             "/api/member/create",
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",
+            "/ws/**"
     };
 
     private static final String[] LoginApiUrl = {

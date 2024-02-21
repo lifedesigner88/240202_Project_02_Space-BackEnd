@@ -3,6 +3,7 @@ package com.encore.space.domain.chat.controller;
 import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.chat.dto.ChatRoomDetailDto;
 import com.encore.space.domain.chat.dto.ChatRoomSearchDto;
+import com.encore.space.domain.chat.dto.MemberChatRoomDto;
 import com.encore.space.domain.chat.service.ChatRoomService;
 import com.encore.space.domain.login.domain.CustomUserDetails;
 import com.encore.space.domain.member.service.MemberService;
@@ -28,17 +29,17 @@ public class ChatRoomController {
     private final MemberService memberService;
 
     /**
-     * 이거 쓰셈!!! 다른 것 사용안함!!
+     *
      * @param chatRoomSearchDto
      * @param pageable
      * @return
      */
     @GetMapping("chat/rooms")
-    public ResponseEntity<CommonResponse> findChatRooms(ChatRoomSearchDto chatRoomSearchDto, Pageable pageable) {
+    public ResponseEntity<CommonResponse> findChatRooms(@AuthenticationPrincipal CustomUserDetails customUserDetails, ChatRoomSearchDto chatRoomSearchDto, Pageable pageable) {
         List<ChatRoomDetailDto> chatRoomDetailDtos = chatRoomService.findAll(chatRoomSearchDto, pageable);
         return CommonResponse.responseMessage(
                 HttpStatus.OK,
-                "채팅룸 검색 성공",
+                memberService.findByEmail(customUserDetails.getUsername()).getNickname(),
                 chatRoomDetailDtos
         );
     }
@@ -98,11 +99,23 @@ public class ChatRoomController {
     // 채팅 방 입장
     // ChatRoomDetailDto 반환하도록 수정할 것.
     @GetMapping("/chat/room/enter/{roomId}")
-    public ResponseEntity<CommonResponse> roomDetail(@PathVariable("roomId") String roomId) {
+    public ResponseEntity<CommonResponse> roomDetail(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("roomId") String roomId) {
         return CommonResponse.responseMessage(
                 HttpStatus.OK,
-                "입장 성공",
+                memberService.findByEmail(customUserDetails.getUsername()).getNickname(),
                 chatRoomService.findRoomIdChatList(roomId)
         );
     }
+
+    @GetMapping("/chat/room/{roomId}/subscribers")
+    public ResponseEntity<CommonResponse> getSubscribers(@PathVariable("roomId") String roomId) {
+        List<MemberChatRoomDto> subscribers = chatRoomService.findSubscribersByRoomId(roomId);
+
+        return CommonResponse.responseMessage(
+                HttpStatus.OK,
+                "채팅룸 id=" + roomId + "의 구독자 목록 조회 성공",
+                subscribers
+        );
+    }
+
 }
