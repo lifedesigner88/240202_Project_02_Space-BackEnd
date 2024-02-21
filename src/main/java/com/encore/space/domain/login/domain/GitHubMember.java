@@ -46,7 +46,7 @@ public class GitHubMember implements MemberInfo {
                         connection.getInputStream(),
                         new TypeReference<>() {}
                 );
-                return emails.get(1).getEmail();
+                return emails.get(0).getEmail();
 
             } else {
                 throw new InternalException("GitHub 에서 이메일을 받아오지 못했습니다.");

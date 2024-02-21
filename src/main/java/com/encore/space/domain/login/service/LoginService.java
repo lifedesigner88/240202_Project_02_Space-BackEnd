@@ -86,9 +86,9 @@ public class LoginService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         if(info != null && !memberService.existsByEmail(Objects.requireNonNull(info).getEmail())){
             memberService.memberCreate(
                     MemberReqDto.builder()
-                            .name(info.getName())
+                            .name(info.getName().equals("null") ? info.getEmail() : info.getName())
                             .email(info.getEmail())
-                            .nickname(info.getName())
+                            .nickname(info.getName().equals("null") ? info.getEmail() : info.getName())
                             .profile(info.getPicture())
                             .loginType(info.getProvider())
                             .build()

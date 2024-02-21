@@ -1,7 +1,6 @@
 package com.encore.space.domain.chat.controller;
 
 import com.encore.space.common.response.CommonResponse;
-import com.encore.space.domain.chat.domain.ChatRoom;
 import com.encore.space.domain.chat.dto.ChatRoomDetailDto;
 import com.encore.space.domain.chat.dto.ChatRoomSearchDto;
 import com.encore.space.domain.chat.service.ChatRoomService;
@@ -99,7 +98,11 @@ public class ChatRoomController {
     // 채팅 방 입장
     // ChatRoomDetailDto 반환하도록 수정할 것.
     @GetMapping("/chat/room/enter/{roomId}")
-    public ChatRoom roomDetail(@PathVariable("roomId") String roomId) {
-        return chatRoomService.findRoomByRoomId(roomId);
+    public ResponseEntity<CommonResponse> roomDetail(@PathVariable("roomId") String roomId) {
+        return CommonResponse.responseMessage(
+                HttpStatus.OK,
+                "입장 성공",
+                chatRoomService.findRoomIdChatList(roomId)
+        );
     }
 }

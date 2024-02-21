@@ -1,6 +1,7 @@
 package com.encore.space.domain.chat.service;
 
 import com.encore.space.domain.chat.domain.ChatRoom;
+import com.encore.space.domain.chat.dto.ChatResDto;
 import com.encore.space.domain.chat.dto.ChatRoomCreateDto;
 import com.encore.space.domain.chat.dto.ChatRoomDetailDto;
 import com.encore.space.domain.chat.dto.ChatRoomSearchDto;
@@ -105,12 +106,14 @@ public class ChatRoomService {
                         .id(chatRoom.getRoomId())
                         .name(chatRoom.getRoomName())
                         .host(chatRoom.getHost())
-                        .chatList(chatRoom.getChatList())
+                        .chatList(chatRoom.getChatList().stream().map(ChatResDto::convertToDto).toList())
                         .build())
                 .collect(Collectors.toList());
         return chatRoomDetailDtoList;
     }
 
 
-
+    public ChatRoomDetailDto findRoomIdChatList(String roomId) {
+        return ChatRoomDetailDto.createRoom(findRoomByRoomId(roomId));
+    }
 }
