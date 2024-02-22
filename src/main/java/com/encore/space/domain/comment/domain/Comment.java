@@ -1,5 +1,6 @@
 package com.encore.space.domain.comment.domain;
 
+import com.encore.space.common.domain.BaseEntity;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.post.domain.Post;
 import jakarta.persistence.*;
@@ -19,7 +20,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,13 +35,6 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @CreationTimestamp
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    LocalDateTime createdTime;
-    @UpdateTimestamp
-    @Column(columnDefinition = "TIMESTAMP ON UPDATE CURRENT_TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    LocalDateTime updatedTime;
 
     @Column
     @Builder.Default

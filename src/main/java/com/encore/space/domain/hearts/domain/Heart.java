@@ -32,5 +32,4 @@ public class Heart {
     private Comment comment;
 
 
-
 }

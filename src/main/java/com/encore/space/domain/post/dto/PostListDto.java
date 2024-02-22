@@ -11,11 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class PostListDto {
-        private Long id;
+        private Long postId;
         private String title;
         private String nickname;
-        private LocalDateTime createdTime;
-        private LocalDateTime updatedTime;
+        private String thumbnail;
+        private LocalDateTime created_at;
+        private LocalDateTime updated_at;
         private PostStatus postStatus;
+        private Long spaceId;
 }
-

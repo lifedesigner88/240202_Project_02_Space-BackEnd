@@ -1,6 +1,5 @@
 package com.encore.space.domain.post.dto;
 
-import com.encore.space.domain.post.domain.PostStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,14 +9,15 @@ import java.util.List;
 @Data
 @Builder
 public class PostDetailResDto {
-    private Long id;
     private String title;
     private String contents;
     private String nickname;
-    private LocalDateTime createdTime;
-    private LocalDateTime updatedTime;
-    private PostStatus postStatus;
+    private LocalDateTime created_at;
+    private LocalDateTime updated_at;
+    private String postStatus;
     private Long postHearts;
-    private String thumbnail;
+    private int commentCounts;
     private List<String> attachFiles;
+    private String spaceName;
+    private String spaceType;
 }

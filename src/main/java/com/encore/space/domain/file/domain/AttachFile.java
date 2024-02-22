@@ -21,16 +21,18 @@ public class AttachFile extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Post post;
-
     @Column
     private String attachFileName;
     @Column
     private String attachFilePath;
     @Column
+    private String fileType;
+    @Column
     private Long fileSize;
     @Builder.Default
     private String delYN = "N";
-
+    @Builder.Default
+    private String thumbnail="N";
 
     public void delete(){
         this.delYN="Y";

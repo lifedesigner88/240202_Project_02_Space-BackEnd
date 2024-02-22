@@ -2,6 +2,10 @@ package com.encore.space.common.domain;
 
 
 import com.encore.space.common.config.PasswordConfig;
+import com.encore.space.domain.comment.domain.Comment;
+import com.encore.space.domain.comment.dto.CommentChildrenListDto;
+import com.encore.space.domain.comment.dto.CommentCreateDto;
+import com.encore.space.domain.comment.dto.CommentResDto;
 import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.dto.reqdto.MemberReqDto;
@@ -21,7 +25,9 @@ import com.encore.space.domain.space.dto.reqdto.CreateSpaceReqDto;
 import com.encore.space.domain.space.dto.resdto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,8 +68,7 @@ public class ChangeType {
     }
 
 
-    public Post postCreateDtoToPost(PostCreateDto postCreateDto, Member member, Space space) {
-
+    public Post postCreateDtoTOPost(PostCreateDto postCreateDto, Member member, Space space) {
         return Post.builder()
                 .title(postCreateDto.getTitle())
                 .contents(postCreateDto.getContents())
@@ -72,32 +77,82 @@ public class ChangeType {
                 .build();
     }
 
-    public PostDetailResDto postToPostDetailResDto(Post post, Long postHearts) {
+    public PostDetailResDto postTOPostDetailResDto(Post post, String thumbnailPath, Long postHearts, int commentCounts) {
         List<String> filePath = new ArrayList<>();
         for (AttachFile a : post.getAttachFiles()) {
             filePath.add(a.getAttachFilePath());
         }
         return PostDetailResDto.builder()
-                .id(post.getId())
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .nickname(post.getMember().getNickname())
-                .postStatus(post.getPostStatus())
+                .postStatus(post.getPostStatus().toString())
                 .attachFiles(filePath)
+                .spaceName(post.getSpace().getSpaceName())
+                .spaceType(post.getSpace().getSpaceType().toString())
                 .postHearts(postHearts)
+                .commentCounts(commentCounts)
+                .created_at(post.getCreated_at())
+                .updated_at(post.getUpdated_at())
                 .build();
     }
 
-    public PostListDto postToPostListDto(Post post) {
-        PostListDto postListDto = PostListDto.builder()
-                .id(post.getId())
+    public PostListDto postTOPostListDto(Post post) {
+        return PostListDto.builder()
+                .postId(post.getId())
                 .title(post.getTitle())
                 .nickname(post.getMember().getNickname())
-                .createdTime(post.getCreated_at())
-                .updatedTime(post.getUpdated_at())
+                .thumbnail(post.getThumbnail())
+                .created_at(post.getCreated_at())
+                .updated_at(post.getUpdated_at())
                 .postStatus(post.getPostStatus())
+                .spaceId(post.getSpace().getId())
                 .build();
-        return postListDto;
+    }
+
+    public Comment commentCreateDtoTOComment(CommentCreateDto commentCreateDto,
+                                             Member member,
+                                             Post post,
+                                             Comment parentComment){
+        return Comment.builder()
+                .post(post)
+                .member(member)
+                .content(commentCreateDto.getContents())
+                .parentComment(parentComment)
+                .build();
+    }
+
+    public CommentResDto commentTOCommentResDto(Comment comment, Long commentHearts) {
+        return CommentResDto.builder()
+                .nickname(comment.getMember().getNickname())
+                .contents(comment.getContent())
+                .commentHearts(commentHearts)
+                .created_at(comment.getCreated_at())
+                .updated_at(comment.getUpdated_at())
+                .build();
+    }
+
+    public CommentChildrenListDto commentTOChildrenListDto(Comment comment) {
+        return CommentChildrenListDto.builder()
+                .nickname(comment.getMember().getNickname())
+                .content(comment.getContent())
+                .createdTime(comment.getCreated_at())
+                .updatedTime(comment.getUpdated_at())
+                .build();
+    }
+
+    public AttachFile toAttachFile(MultipartFile m,
+                                   Post post,
+                                   Path path,
+                                   String isThumbnail){
+        return AttachFile.builder()
+                .post(post)
+                .attachFileName(m.getOriginalFilename())
+                .fileSize(m.getSize())
+                .fileType(m.getContentType())
+                .thumbnail(isThumbnail)
+                .attachFilePath(path.toString())
+                .build();
     }
 
     //    스케쥴 관련
@@ -143,7 +198,6 @@ public class ChangeType {
     }
 
     public CreateSpaceResDto spaceTOcreateSpaceResDto(Space space, List<SpaceMember> spaceMembers) {
-
         return CreateSpaceResDto.builder()
                 .spaceName(space.getSpaceName())
                 .spaceType(space.getSpaceType().toString())
@@ -223,6 +277,4 @@ public class ChangeType {
                 .build();
 
     }
-
-
 }
