@@ -39,7 +39,7 @@ public class HeartController {
             summary = "좋아요 취소",
             description = "게시물이나 댓글에 단 좋아요 취소할때, 로그인한 사용자 한해서"
     )
-    @DeleteMapping("/cancel")
+    @PostMapping("/cancel")
     public ResponseEntity<CommonResponse> takeHeart(@RequestBody HeartReqDto heartReqDto,
                                                     @AuthenticationPrincipal CustomUserDetails userDetails){
         heartService.cancelHeart(heartReqDto, userDetails.getUsername());
