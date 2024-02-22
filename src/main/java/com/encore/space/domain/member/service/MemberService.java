@@ -14,6 +14,8 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -98,6 +100,13 @@ public class MemberService {
                 .stream()
                 .map(changeType::memberTOmemberResDto)
                 .collect(Collectors.toList());
+    }
+
+    public MemberResDto getMyInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        Member member = findByEmail(email);
+        return changeType.memberTOmemberResDto(member);
     }
 
 //    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {
