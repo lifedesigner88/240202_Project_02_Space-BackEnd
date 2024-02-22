@@ -52,7 +52,9 @@ public class Post extends BaseEntity {
     public void updatePost(String title, String contents, PostStatus postStatus){
         this.title=title;
         this.contents=contents;
-        this.postStatus = postStatus;
+        if(postStatus!=null){
+            this.postStatus = postStatus;
+        }
     }
 
     public void deletePost(){
