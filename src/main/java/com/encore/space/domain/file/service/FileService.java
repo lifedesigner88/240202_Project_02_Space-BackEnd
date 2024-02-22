@@ -112,4 +112,8 @@ public class FileService {
             attachFile.delete();
         }
     }
+
+    public AttachFile findByFilePath(String path){
+        return fileRepository.findByAttachFilePath(path);
+    }
 }

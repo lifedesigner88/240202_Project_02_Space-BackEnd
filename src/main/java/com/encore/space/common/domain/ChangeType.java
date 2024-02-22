@@ -86,10 +86,10 @@ public class ChangeType {
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .nickname(post.getMember().getNickname())
-                .postStatus(post.getPostStatus())
+                .postStatus(post.getPostStatus().toString())
                 .attachFiles(filePath)
-                .thumbnail(post.getThumbnail())
-                .space(post.getSpace())
+                .spaceName(post.getSpace().getSpaceName())
+                .spaceType(post.getSpace().getSpaceType().toString())
                 .postHearts(postHearts)
                 .commentCounts(commentCounts)
                 .created_at(post.getCreated_at())
@@ -105,7 +105,7 @@ public class ChangeType {
                 .created_at(post.getCreated_at())
                 .updated_at(post.getUpdated_at())
                 .postStatus(post.getPostStatus())
-                .space(post.getSpace())
+                .spaceId(post.getSpace().getId())
                 .build();
     }
 
@@ -121,10 +121,11 @@ public class ChangeType {
                 .build();
     }
 
-    public CommentResDto commentTOCommentResDto(Comment comment) {
+    public CommentResDto commentTOCommentResDto(Comment comment, Long commentHearts) {
         return CommentResDto.builder()
                 .nickname(comment.getMember().getNickname())
                 .contents(comment.getContent())
+                .commentHearts(commentHearts)
                 .created_at(comment.getCreated_at())
                 .updated_at(comment.getUpdated_at())
                 .build();
@@ -194,7 +195,6 @@ public class ChangeType {
     }
 
     public CreateSpaceResDto spaceTOcreateSpaceResDto(Space space, List<SpaceMember> spaceMembers) {
-
         return CreateSpaceResDto.builder()
                 .spaceName(space.getSpaceName())
                 .spaceType(space.getSpaceType().toString())

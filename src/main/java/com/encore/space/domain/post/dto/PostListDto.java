@@ -18,5 +18,5 @@ public class PostListDto {
         private LocalDateTime created_at;
         private LocalDateTime updated_at;
         private PostStatus postStatus;
-        private Space space;
+        private Long spaceId;
 }

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class CommentResDto {
     private String nickname;
     private String contents;
+    private Long commentHearts;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
 
