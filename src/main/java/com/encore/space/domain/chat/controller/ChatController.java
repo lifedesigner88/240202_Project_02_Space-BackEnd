@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -150,11 +152,18 @@ public class ChatController {
 //        return message;
 //    }
 
+//    @MessageMapping("/chat/send/{roomId}")
+//    public void sendMessage(@PathVariable String roomId, ChatReqDto message) {
+//        Chat createdChat = chatService.save(message, MessageType.CHAT);
+//        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
+//        simpMessagingTemplate.convertAndSend("/sub/chat/send/" + roomId, chatResDto);
+//        log.info("여기에요!!!!!" + roomId);
+//    }
+
     @MessageMapping("/chat/send/{roomId}")
-    public void sendMessage(@PathVariable String roomId, ChatReqDto message) {
-        Chat createdChat = chatService.save(message, MessageType.CHAT);
-        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
-        simpMessagingTemplate.convertAndSend("/sub/chat/send/" + roomId, chatResDto);
-        log.info("여기에요!!!!!" + roomId);
+    @SendTo("/sub/chat/send/{roomId}")
+    public String sendMessage(@DestinationVariable String roomId, String message) {
+        // 받은 메시지를 그대로 다시 전송합니다.
+        return message;
     }
 }
