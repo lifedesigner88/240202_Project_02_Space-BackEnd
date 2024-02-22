@@ -76,7 +76,8 @@ public class CommentService {
         List<CommentResDto> commentResDtoList = new ArrayList<>();
         List<Comment> commentList = this.findAllByPostId(postId);
         for(Comment c: commentList) {
-            commentResDtoList.add(changeType.commentTOCommentResDto(c));
+            Long commentHearts= heartService.commentHearts(c.getId());
+            commentResDtoList.add(changeType.commentTOCommentResDto(c,commentHearts));
         }
         return commentResDtoList;
     }
