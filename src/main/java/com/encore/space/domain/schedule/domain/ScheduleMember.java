@@ -1,5 +1,6 @@
 package com.encore.space.domain.schedule.domain;
 
+import com.encore.space.common.domain.BaseEntity;
 import com.encore.space.domain.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @IdClass(ScheduleMemberId.class)
-public class ScheduleMember {
+public class ScheduleMember extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(nullable = false)
