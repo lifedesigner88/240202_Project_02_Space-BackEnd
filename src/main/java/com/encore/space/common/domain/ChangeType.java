@@ -77,7 +77,7 @@ public class ChangeType {
                 .build();
     }
 
-    public PostDetailResDto postTOPostDetailResDto(Post post, String thumbnailPath, Long postHearts, int commentCounts) {
+    public PostDetailResDto postTOPostDetailResDto(Post post, Long postHearts, int commentCounts) {
         List<String> filePath = new ArrayList<>();
         for (AttachFile a : post.getAttachFiles()) {
             filePath.add(a.getAttachFilePath());
