@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatReqDto {
+    private String message; // 메시지
     private String roomId;  // 채팅방 ID
     private String sender;  // 보내는이
-    private String message; // 메시지
 }
