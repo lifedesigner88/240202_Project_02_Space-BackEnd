@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +47,7 @@ public class MemberController {
             description = "신규 회원 생성"
     )
     @PostMapping("/create")
-    public ResponseEntity<CommonResponse> memberCreate(@RequestBody @Valid MemberReqDto memberReqDto){
+    public ResponseEntity<CommonResponse> memberCreate(@RequestBody @Valid MemberReqDto memberReqDto) {
         return CommonResponse.responseMessage(
                 HttpStatus.CREATED,
                 "회원가입 성공",
@@ -107,13 +106,24 @@ public class MemberController {
 //    @PreAuthorize("hasAnyRole('MANAGER')")
 
     @PostMapping("/qwe")
-    public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails){
-        return "ok" + userDetails.getUsername() ;
+    public String qwe(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return "ok" + userDetails.getUsername();
     }
 
-//    세종 임시로 만듬 (스페이스 초대용)
+    @Operation(
+            summary = "가입된 모든 회원 조회",
+            description = "모든 회원 조회"
+    )
     @GetMapping("/members")
-        public ResponseEntity<CommonResponse> findAllMembers () {
+    public ResponseEntity<CommonResponse> findAllMembers() {
         return CommonResponse.responseMessage(HttpStatus.OK, "모든 회원 조회", memberService.findAllMembers());
+    }
+    @Operation(
+            summary = "로그인된 개인정보 조회",
+            description = "개인정보조회"
+    )
+    @GetMapping("/mypage")
+    public ResponseEntity<CommonResponse> getMyInfo() {
+        return CommonResponse.responseMessage(HttpStatus.OK, "MyPage 정보", memberService.getMyInfo());
     }
 }
