@@ -131,10 +131,10 @@ public class ChatController {
     )
     @MessageMapping("/chat/send/{roomId}")
     @SendTo("/sub/chat/send/{roomId}")
-    public String sendMessage(@DestinationVariable String roomId, ChatReqDto messageData) {
+    public ChatResDto sendMessage(@DestinationVariable String roomId, ChatReqDto messageData) {
         Chat createdChat = chatService.save(messageData, MessageType.CHAT);
         ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
         // 받은 메시지를 그대로 다시 전송합니다.
-        return chatResDto.getMessage();
+        return chatResDto;
     }
 }
