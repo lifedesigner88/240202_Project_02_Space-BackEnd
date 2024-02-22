@@ -22,7 +22,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -162,8 +161,10 @@ public class ChatController {
 
     @MessageMapping("/chat/send/{roomId}")
     @SendTo("/sub/chat/send/{roomId}")
-    public String sendMessage(@DestinationVariable String roomId, String message) {
+    public String sendMessage(@DestinationVariable String roomId, ChatReqDto messageData) {
+        Chat createdChat = chatService.save(messageData, MessageType.CHAT);
+        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
         // 받은 메시지를 그대로 다시 전송합니다.
-        return message;
+        return chatResDto.getMessage();
     }
 }
