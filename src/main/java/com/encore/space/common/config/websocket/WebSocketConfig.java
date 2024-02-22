@@ -11,27 +11,26 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-//    @Autowired
-//    private StompHandler stompHandler;  // JWT 인증 관련
-
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/sub", "/user");
+
+        // 클라이언트가 구독할 수 있는 endpoint의 접두사를 설정합니다.
+        // 구독은 클라이언트가 서버로부터 메시지를 받기 위해 사용됩니다.
+        // SimpMessagingTemplate의 convertAndSend() 메소드는 이 endpoint를 사용하여 메시지를 전송하며,
+        // 구독하고 있는 모든 클라이언트가 이 메시지를 받게 됩니다.
+        registry.enableSimpleBroker("/sub");
+
+        // 클라이언트에서 메시지를 보내는 데 사용되는 endpoint의 접두사를 설정합니다.
+        // 클라이언트는 이 접두사를 사용하여 메시지를 보내며, 이 메시지는 @MessageMapping으로 어노테이션이 달린 컨트롤러 메소드에 전달됩니다.
         registry.setApplicationDestinationPrefixes("/pub");
-        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:8080", "http://localhost:8081")
+                .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
-
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(stompHandler);
-//    }
 
     /**
      * 메시지 크기 제한을 통해서 클라이언트의 악의적인 요청을 차단
