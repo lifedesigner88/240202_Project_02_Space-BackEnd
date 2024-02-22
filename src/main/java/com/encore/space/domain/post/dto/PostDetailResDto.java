@@ -17,7 +17,6 @@ public class PostDetailResDto {
     private String postStatus;
     private Long postHearts;
     private int commentCounts;
-    private String thumbnail;
     private List<String> attachFiles;
     private String spaceName;
     private String spaceType;

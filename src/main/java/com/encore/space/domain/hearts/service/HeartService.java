@@ -23,7 +23,6 @@ public class HeartService {
     private final HeartRepository heartRepository;
     private final CommentRepository commentRepository;
     private final MemberService memberService;
-
     private final PostRepository postRepository;
 
     @Autowired

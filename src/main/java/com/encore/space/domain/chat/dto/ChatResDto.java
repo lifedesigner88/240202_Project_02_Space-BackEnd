@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatResDto {
+    private Long id;
     private String messageType;
     private String roomId;
     private String sender;
@@ -20,6 +21,7 @@ public class ChatResDto {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm");
         String formatedNow = chat.getSendAt().format(formatter);
         return new ChatResDto(
+                chat.getId(),
                 chat.getMessageType().toString(),
                 chat.getChatroom().getRoomId(),
                 chat.getSender(),
