@@ -100,13 +100,14 @@ public class ChangeType {
 
     public PostListDto postTOPostListDto(Post post) {
         return PostListDto.builder()
+                .postId(post.getId())
                 .title(post.getTitle())
                 .nickname(post.getMember().getNickname())
                 .thumbnail(post.getThumbnail())
                 .created_at(post.getCreated_at())
                 .updated_at(post.getUpdated_at())
                 .postStatus(post.getPostStatus())
-                .space(post.getSpace())
+                .spaceId(post.getSpace().getId())
                 .build();
     }
 
