@@ -88,7 +88,6 @@ public class ChangeType {
                 .nickname(post.getMember().getNickname())
                 .postStatus(post.getPostStatus().toString())
                 .attachFiles(filePath)
-                .thumbnail(thumbnailPath)
                 .spaceName(post.getSpace().getSpaceName())
                 .spaceType(post.getSpace().getSpaceType().toString())
                 .postHearts(postHearts)
@@ -123,10 +122,11 @@ public class ChangeType {
                 .build();
     }
 
-    public CommentResDto commentTOCommentResDto(Comment comment) {
+    public CommentResDto commentTOCommentResDto(Comment comment, Long commentHearts) {
         return CommentResDto.builder()
                 .nickname(comment.getMember().getNickname())
                 .contents(comment.getContent())
+                .commentHearts(commentHearts)
                 .created_at(comment.getCreated_at())
                 .updated_at(comment.getUpdated_at())
                 .build();
