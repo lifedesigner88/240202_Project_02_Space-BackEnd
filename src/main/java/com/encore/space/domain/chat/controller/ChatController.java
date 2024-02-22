@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -124,21 +125,28 @@ public class ChatController {
         simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
     }
 
-    @Operation(
-            summary = "채팅 메시지를 전송할 때",
-            description = """
-            - 사용자가 채팅방에 메시지를 보낼 때 "/chat/send"라는 경로를 통해 메시지 요청이 들어오면 현재 메서드가 호출된다.
-            - 요청으로부터 채팅 메시지 정보가 담긴 ChatReqDto 객체를 받아 요청을 처리한다.
-            - 채팅 서비스에 메시지 정보와 메시지 유형(MessageType.CHAT)을 전달하여 새로운 채팅 메시지를 저장
-            - 저장된 채팅 메시지를 ChatResDto로 변환 후 채팅방의 모든 구독자에게 전송한다.
-            """
-    )
-    @MessageMapping("/chat/send")
-    public void sendMessage(ChatReqDto message) {
-        log.info("out: {}", message);
-        Chat createdChat = chatService.save(message, MessageType.CHAT);
-        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
+//    @Operation(
+//            summary = "채팅 메시지를 전송할 때",
+//            description = """
+//            - 사용자가 채팅방에 메시지를 보낼 때 "/chat/send"라는 경로를 통해 메시지 요청이 들어오면 현재 메서드가 호출된다.
+//            - 요청으로부터 채팅 메시지 정보가 담긴 ChatReqDto 객체를 받아 요청을 처리한다.
+//            - 채팅 서비스에 메시지 정보와 메시지 유형(MessageType.CHAT)을 전달하여 새로운 채팅 메시지를 저장
+//            - 저장된 채팅 메시지를 ChatResDto로 변환 후 채팅방의 모든 구독자에게 전송한다.
+//            """
+//    )
+//    @MessageMapping("/chat/send")
+//    public void sendMessage(ChatReqDto message) {
+//        log.info("out: {}", message);
+//        Chat createdChat = chatService.save(message, MessageType.CHAT);
+//        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
+//
+//        simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
+//    }
 
-        simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
+    @MessageMapping("/chat/send")
+    @SendTo("/sub/chat/send")
+    public String sendMessage(String message) {
+        // 받은 메시지를 그대로 다시 전송합니다.
+        return message;
     }
 }
