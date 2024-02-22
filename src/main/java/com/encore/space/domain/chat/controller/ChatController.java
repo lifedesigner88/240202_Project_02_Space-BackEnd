@@ -12,6 +12,7 @@ import com.encore.space.domain.chat.service.MemberChatRoomService;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "웹소켓 통신을 위한 API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -36,7 +38,7 @@ public class ChatController {
     private final MemberChatRoomService memberChatRoomService;
 
     @Operation(
-            summary = "WebSocket을 통해서 채팅방에 입장하는 경우의 로직을 처리하는 메서드",
+            summary = "WebSocket을 통해서 채팅방에 입장하는 경우의 로직을 처리",
             description = """
                     - 사용자가 채팅방에 입장할 때 "/chat/enter"를 통해서 메시지 요청이 들어오면 현재 메서드가 호출.
                     - 사용자가 최초로 입장하면 입장했음을 알리는 메시지를 채팅방에 보낸다.
@@ -84,16 +86,13 @@ public class ChatController {
 
     @Operation(
             summary = "사용자가 채팅룸은 나갔지만, 구독을 취소하지 않은 경우",
-            description = """
-                    - 구체적인 로직을 처리하지 않고, 요청 정보를 로그로 출력한다.
-                    """
+            description = "구체적인 로직을 처리하지 않고, 요청 정보를 로그로 출력"
     )
     @MessageMapping("/chat/out")
     public void out(ChatReqDto message) {
         log.info("out: {}", message);
     }
 
-    // 채팅룸을 나가면서 구독도 취소한 경우
     @Operation(
             summary = "사용자가 채팅방을 나가면서 해당 채팅방에 대한 구독도 취소하는 경우",
             description = """
@@ -126,39 +125,10 @@ public class ChatController {
         simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
     }
 
-//    @Operation(
-//            summary = "채팅 메시지를 전송할 때",
-//            description = """
-//            - 사용자가 채팅방에 메시지를 보낼 때 "/chat/send"라는 경로를 통해 메시지 요청이 들어오면 현재 메서드가 호출된다.
-//            - 요청으로부터 채팅 메시지 정보가 담긴 ChatReqDto 객체를 받아 요청을 처리한다.
-//            - 채팅 서비스에 메시지 정보와 메시지 유형(MessageType.CHAT)을 전달하여 새로운 채팅 메시지를 저장
-//            - 저장된 채팅 메시지를 ChatResDto로 변환 후 채팅방의 모든 구독자에게 전송한다.
-//            """
-//    )
-//    @MessageMapping("/chat/send")
-//    public void sendMessage(ChatReqDto message) {
-//        log.info("out: {}", message);
-//        Chat createdChat = chatService.save(message, MessageType.CHAT);
-//        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
-//
-//        simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
-//    }
-
-//    @MessageMapping("/chat/send")
-//    @SendTo("/sub/chat/send")
-//    public String sendMessage(String message) {
-//        // 받은 메시지를 그대로 다시 전송합니다.
-//        return message;
-//    }
-
-//    @MessageMapping("/chat/send/{roomId}")
-//    public void sendMessage(@PathVariable String roomId, ChatReqDto message) {
-//        Chat createdChat = chatService.save(message, MessageType.CHAT);
-//        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
-//        simpMessagingTemplate.convertAndSend("/sub/chat/send/" + roomId, chatResDto);
-//        log.info("여기에요!!!!!" + roomId);
-//    }
-
+    @Operation(
+            summary = "메시지 전송 및 DB 저장",
+            description = "구독 중인 채팅룸으로 메시지를 전송과 동시에 DB에 채팅 메시지를 저장"
+    )
     @MessageMapping("/chat/send/{roomId}")
     @SendTo("/sub/chat/send/{roomId}")
     public String sendMessage(@DestinationVariable String roomId, ChatReqDto messageData) {

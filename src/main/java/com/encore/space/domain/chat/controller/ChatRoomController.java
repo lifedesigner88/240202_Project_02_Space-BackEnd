@@ -3,10 +3,11 @@ package com.encore.space.domain.chat.controller;
 import com.encore.space.common.response.CommonResponse;
 import com.encore.space.domain.chat.dto.ChatRoomDetailDto;
 import com.encore.space.domain.chat.dto.ChatRoomSearchDto;
-import com.encore.space.domain.chat.dto.MemberChatRoomDto;
 import com.encore.space.domain.chat.service.ChatRoomService;
 import com.encore.space.domain.login.domain.CustomUserDetails;
 import com.encore.space.domain.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "채팅룸 관련 API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -28,12 +30,10 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
     private final MemberService memberService;
 
-    /**
-     *
-     * @param chatRoomSearchDto
-     * @param pageable
-     * @return
-     */
+    @Operation(
+            summary = "전체 채팅룸 검색",
+            description = "모든 채팅룸을 검색"
+    )
     @GetMapping("chat/rooms")
     public ResponseEntity<CommonResponse> findChatRooms(@AuthenticationPrincipal CustomUserDetails customUserDetails, ChatRoomSearchDto chatRoomSearchDto, Pageable pageable) {
         List<ChatRoomDetailDto> chatRoomDetailDtos = chatRoomService.findAll(chatRoomSearchDto, pageable);
@@ -44,34 +44,10 @@ public class ChatRoomController {
         );
     }
 
-//    @GetMapping("/chat/room")
-//    public ResponseEntity<CommonResponse> findAllRooms() {
-//        return CommonResponse.responseMessage(
-//                HttpStatus.OK,
-//                "전체 채팅룸 검색 성공",
-//                chatRoomService.findAllRoom()
-//        );
-//    }
-
-    // ChatRoomDetailDto 반환하도록 수정할 것.
-//    @GetMapping("/chat/room/roomid/{roomId}")
-//    public ResponseEntity<CommonResponse> findRoomById(@PathVariable("roomId") String roomId) {
-//        return CommonResponse.responseMessage(
-//                HttpStatus.OK,
-//                "채팅룸 id=" + roomId + " 검색 성공",
-//                chatRoomService.findRoomByRoomId(roomId)
-//        );
-//    }
-
-//    @GetMapping("/chat/room/roomname/{roomName}")
-//    public ResponseEntity<CommonResponse> findRoomByName(@PathVariable("roomName") String roomName) {
-//        return CommonResponse.responseMessage(
-//                HttpStatus.OK,
-//                "채팅룸 roomName=" + roomName,
-//                chatRoomService.findRoomByRoomName(roomName)
-//        );
-//    }
-
+    @Operation(
+            summary = "채팅룸 생성",
+            description = "특정 name의 채팅룸을 생성"
+    )
     @PostMapping("/chat/room/{name}")
     public ResponseEntity<CommonResponse> createRoom(
             @PathVariable("name") String name,
@@ -86,6 +62,10 @@ public class ChatRoomController {
         );
     }
 
+    @Operation(
+            summary = "채팅룸 삭제",
+            description = "특정 roomId에 해당되는 채팅룸을 삭제"
+    )
     @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/chat/room/{roomId}")
     public ResponseEntity<CommonResponse> deleteRoom(@PathVariable("roomId") String roomId) {
@@ -96,25 +76,16 @@ public class ChatRoomController {
         );
     }
 
-    // 채팅 방 입장
-    // ChatRoomDetailDto 반환하도록 수정할 것.
+    @Operation(
+            summary = "채팅룸 상세 정보 조회",
+            description = "특정 roomId에 해당되는 채팅룸의 상세 정보를 제공"
+    )
     @GetMapping("/chat/room/enter/{roomId}")
     public ResponseEntity<CommonResponse> roomDetail(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable("roomId") String roomId) {
         return CommonResponse.responseMessage(
                 HttpStatus.OK,
                 memberService.findByEmail(customUserDetails.getUsername()).getNickname(),
                 chatRoomService.findRoomIdChatList(roomId)
-        );
-    }
-
-    @GetMapping("/chat/room/{roomId}/subscribers")
-    public ResponseEntity<CommonResponse> getSubscribers(@PathVariable("roomId") String roomId) {
-        List<MemberChatRoomDto> subscribers = chatRoomService.findSubscribersByRoomId(roomId);
-
-        return CommonResponse.responseMessage(
-                HttpStatus.OK,
-                "채팅룸 id=" + roomId + "의 구독자 목록 조회 성공",
-                subscribers
         );
     }
 
