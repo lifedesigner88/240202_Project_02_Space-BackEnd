@@ -77,7 +77,7 @@ public class ChangeType {
                 .build();
     }
 
-    public PostDetailResDto postTOPostDetailResDto(Post post, Long postHearts, int commentCounts) {
+    public PostDetailResDto postTOPostDetailResDto(Post post, String thumbnailPath, Long postHearts, int commentCounts) {
         List<String> filePath = new ArrayList<>();
         for (AttachFile a : post.getAttachFiles()) {
             filePath.add(a.getAttachFilePath());
@@ -86,9 +86,9 @@ public class ChangeType {
                 .title(post.getTitle())
                 .contents(post.getContents())
                 .nickname(post.getMember().getNickname())
-                .postStatus(post.getPostStatus())
+                .postStatus(post.getPostStatus().toString())
                 .attachFiles(filePath)
-                .thumbnail(post.getThumbnail())
+                .thumbnail(thumbnailPath)
                 .spaceName(post.getSpace().getSpaceName())
                 .spaceType(post.getSpace().getSpaceType().toString())
                 .postHearts(postHearts)
@@ -142,12 +142,14 @@ public class ChangeType {
 
     public AttachFile toAttachFile(MultipartFile m,
                                    Post post,
-                                   Path path){
+                                   Path path,
+                                   String isThumbnail){
         return AttachFile.builder()
                 .post(post)
                 .attachFileName(m.getOriginalFilename())
                 .fileSize(m.getSize())
                 .fileType(m.getContentType())
+                .thumbnail(isThumbnail)
                 .attachFilePath(path.toString())
                 .build();
     }
@@ -195,7 +197,6 @@ public class ChangeType {
     }
 
     public CreateSpaceResDto spaceTOcreateSpaceResDto(Space space, List<SpaceMember> spaceMembers) {
-
         return CreateSpaceResDto.builder()
                 .spaceName(space.getSpaceName())
                 .spaceType(space.getSpaceType().toString())

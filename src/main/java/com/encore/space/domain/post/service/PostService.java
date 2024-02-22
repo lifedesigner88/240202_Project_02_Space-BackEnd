@@ -3,6 +3,7 @@ package com.encore.space.domain.post.service;
 import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.comment.domain.Comment;
 import com.encore.space.domain.comment.repository.CommentRepository;
+import com.encore.space.domain.file.domain.AttachFile;
 import com.encore.space.domain.file.service.FileService;
 import com.encore.space.domain.hearts.service.HeartService;
 import com.encore.space.domain.member.domain.Member;
@@ -89,7 +90,9 @@ public class PostService {
         Post post = this.findByPostId(postId);
         Long postHearts = heartService.postHearts(postId);
         int commentCounts= commentRepository.findAllByPostId(postId).size();
-        return changeType.postTOPostDetailResDto(post, postHearts, commentCounts);
+        AttachFile thumbnail= fileService.findByFilePath(post.getThumbnail());
+        String thumbnailPath= thumbnail.getAttachFileName();
+        return changeType.postTOPostDetailResDto(post, thumbnailPath, postHearts, commentCounts);
     }
 
     //게시글 목록 조회

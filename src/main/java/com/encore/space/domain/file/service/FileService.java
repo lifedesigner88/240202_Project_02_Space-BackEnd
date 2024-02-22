@@ -40,7 +40,8 @@ public class FileService {
         try {
             byte[] bytes = thumbnail.getBytes();
             Files.write(thumbnailPath, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-            fileRepository.save(changeType.toAttachFile(thumbnail,post,thumbnailPath));
+            String isThumbnail="Y";
+            fileRepository.save(changeType.toAttachFile(thumbnail,post,thumbnailPath, isThumbnail));
             post.setThumbnail(thumbnailPath.toString());
         } catch (IOException e) {
             throw new IllegalArgumentException("image not available");
@@ -66,10 +67,10 @@ public class FileService {
                     UUID uuid = UUID.randomUUID();
                     String attachFileName = uuid + "_" + multipartFile.getOriginalFilename();
                     Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
-
+                    String isThumbnail="N";
                     byte[] bytes = multipartFile.getBytes();
                     Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-                    fileRepository.save(changeType.toAttachFile(multipartFile,post,path));
+                    fileRepository.save(changeType.toAttachFile(multipartFile,post,path,isThumbnail));
                 }
             } catch (IOException e) {
                 throw new IllegalArgumentException("file not available");
@@ -93,15 +94,6 @@ public class FileService {
         }
     }
 
-    public AttachFile findById(Long id) throws EntityNotFoundException {
-        AttachFile attachFile = fileRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 파일입니다."));
-        if(attachFile.getDelYN().equals("Y")){
-            throw new EntityNotFoundException("이미 삭제된 파일입니다.");
-        } else {
-            return attachFile;
-        }
-    }
-
     //업로드 파일 삭제
     public void delete(Long id) throws EntityNotFoundException {
         AttachFile attachFile= fileRepository.findById(id).orElseThrow(()->new EntityNotFoundException("존재하지 않는 파일입니다."));
@@ -111,4 +103,20 @@ public class FileService {
             attachFile.delete();
         }
     }
+    public AttachFile findById(Long id) throws EntityNotFoundException {
+        AttachFile attachFile = fileRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 파일입니다."));
+        if(attachFile.getDelYN().equals("Y")){
+            throw new EntityNotFoundException("이미 삭제된 파일입니다.");
+        } else {
+            return attachFile;
+        }
+    }
+
+    // 파일 경로로 파일 가져오는 함수
+    public AttachFile findByFilePath(String path){
+        return fileRepository.findByAttachFilePath(path);
+
+    }
+
+
 }
