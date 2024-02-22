@@ -126,6 +126,7 @@ public class SecurityConfig {
 
     private static final String[] FileResource = {
             "/static/**",
+            "/images/**",
     };
 
     private static final String[] ManagerApiUrl = {

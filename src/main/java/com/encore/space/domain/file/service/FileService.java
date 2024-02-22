@@ -42,8 +42,8 @@ public class FileService {
             byte[] bytes = thumbnail.getBytes();
             Files.write(thumbnailPath, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             String isThumbnail="Y";
-            fileRepository.save(changeType.toAttachFile(thumbnail,post,thumbnailPath, isThumbnail));
-            post.setThumbnail(thumbnailPath.toString());
+            fileRepository.save(changeType.toAttachFile(thumbnail,post,"http://localhost:8080/images/"+thumbnailFileName, isThumbnail));
+            post.setThumbnail("http://localhost:8080/images/"+thumbnailFileName);
         } catch (IOException e) {
             throw new IllegalArgumentException("image not available");
         }
@@ -61,17 +61,18 @@ public class FileService {
     }
 
     //첨부파일 업로드
-    public void uploadAttachFiles(List<MultipartFile> attachFileList, Post post) throws EntityNotFoundException, IllegalArgumentException {
-        for (MultipartFile multipartFile : attachFileList) {
+    public void uploadAttachFiles(List<MultipartFile> attachFileList, Post post, List<String> imgUrlList) throws EntityNotFoundException, IllegalArgumentException {
+        for (int i = 0; i< attachFileList.size(); i++) {
             try {
-                if(!Objects.requireNonNull(multipartFile.getOriginalFilename()).isEmpty()){
+                if(!Objects.requireNonNull(attachFileList.get(i).getOriginalFilename()).isEmpty()){
                     UUID uuid = UUID.randomUUID();
-                    String attachFileName = uuid + "_" + multipartFile.getOriginalFilename();
+                    String attachFileName = uuid + "_" + attachFileList.get(i).getOriginalFilename();
                     Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
                     String isThumbnail="N";
-                    byte[] bytes = multipartFile.getBytes();
+                    byte[] bytes = attachFileList.get(i).getBytes();
                     Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-                    fileRepository.save(changeType.toAttachFile(multipartFile,post,path,isThumbnail));
+                    post.setContents(post.getContents().replace(imgUrlList.get(0),"http://localhost:8080/images/"+ attachFileName));
+                    fileRepository.save(changeType.toAttachFile(attachFileList.get(i),post,"http://localhost:8080/images/"+attachFileName ,isThumbnail));
                 }
             } catch (IOException e) {
                 throw new IllegalArgumentException("file not available");

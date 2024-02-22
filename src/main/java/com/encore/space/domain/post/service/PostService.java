@@ -80,7 +80,7 @@ public class PostService {
 
         if (!postCreateDto.getAttachFileList().isEmpty()) {
             fileService.setThumbnail(postCreateDto.getAttachFileList().get(0),post);
-            fileService.uploadAttachFiles(postCreateDto.getAttachFileList(), post);
+            fileService.uploadAttachFiles(postCreateDto.getAttachFileList(), post, postCreateDto.getImgUrlList());
         }
     }
 
@@ -116,7 +116,7 @@ public class PostService {
             }
             post.updatePost(postUpdateDto.getTitle(), postUpdateDto.getContents(), postUpdateDto.getPostStatus());
             if (!postUpdateDto.getAttachFileList().isEmpty()) {
-                fileService.uploadAttachFiles(postUpdateDto.getAttachFileList(), post);
+                fileService.uploadAttachFiles(postUpdateDto.getAttachFileList(), post, postUpdateDto.getImgUrlList());
             }
         } else {
             throw new AccessDeniedException("권한이 없습니다.");
