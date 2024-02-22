@@ -122,6 +122,7 @@ public class SecurityConfig {
 
     private static final String[] PostApiUrl = {
             "/api/post/list",
+            "/PostDetail/**",
     };
 
     private static final String[] FileResource = {
