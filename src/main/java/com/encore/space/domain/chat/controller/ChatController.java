@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -34,7 +34,7 @@ public class ChatController {
     private final ChatRoomService chatRoomService;
     private final MemberChatRoomService memberChatRoomService;
 
-    @Operation (
+    @Operation(
             summary = "WebSocket을 통해서 채팅방에 입장하는 경우의 로직을 처리하는 메서드",
             description = """
                     - 사용자가 채팅방에 입장할 때 "/chat/enter"를 통해서 메시지 요청이 들어오면 현재 메서드가 호출.
@@ -65,7 +65,7 @@ public class ChatController {
             }
             // 해당 URL을 구독하고 있는 사람들에게 전송
             simpMessagingTemplate.convertAndSend(
-                    "/user/" + message.getSender() + "/sub/chat/enter/" + message.getRoomId(),
+                    message.getSender() + "/sub/chat/" + message.getRoomId(),
                     chatList
             );
 
@@ -143,10 +143,18 @@ public class ChatController {
 //        simpMessagingTemplate.convertAndSend("/sub/chat/" + message.getRoomId(), chatResDto);
 //    }
 
-    @MessageMapping("/chat/send")
-    @SendTo("/sub/chat/send")
-    public String sendMessage(String message) {
-        // 받은 메시지를 그대로 다시 전송합니다.
-        return message;
+//    @MessageMapping("/chat/send")
+//    @SendTo("/sub/chat/send")
+//    public String sendMessage(String message) {
+//        // 받은 메시지를 그대로 다시 전송합니다.
+//        return message;
+//    }
+
+    @MessageMapping("/chat/send/{roomId}")
+    public void sendMessage(@PathVariable String roomId, ChatReqDto message) {
+        Chat createdChat = chatService.save(message, MessageType.CHAT);
+        ChatResDto chatResDto = ChatResDto.convertToDto(createdChat);
+        simpMessagingTemplate.convertAndSend("/sub/chat/send/" + roomId, chatResDto);
+        log.info("여기에요!!!!!" + roomId);
     }
 }
