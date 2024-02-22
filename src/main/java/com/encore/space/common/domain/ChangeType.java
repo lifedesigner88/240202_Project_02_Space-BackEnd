@@ -77,7 +77,7 @@ public class ChangeType {
                 .build();
     }
 
-    public PostDetailResDto postTOPostDetailResDto(Post post, Long postHearts, int commentCounts) {
+    public PostDetailResDto postTOPostDetailResDto(Post post, String thumbnailPath, Long postHearts, int commentCounts) {
         List<String> filePath = new ArrayList<>();
         for (AttachFile a : post.getAttachFiles()) {
             filePath.add(a.getAttachFilePath());
@@ -99,6 +99,7 @@ public class ChangeType {
 
     public PostListDto postTOPostListDto(Post post) {
         return PostListDto.builder()
+                .postId(post.getId())
                 .title(post.getTitle())
                 .nickname(post.getMember().getNickname())
                 .thumbnail(post.getThumbnail())
@@ -142,12 +143,14 @@ public class ChangeType {
 
     public AttachFile toAttachFile(MultipartFile m,
                                    Post post,
-                                   Path path){
+                                   Path path,
+                                   String isThumbnail){
         return AttachFile.builder()
                 .post(post)
                 .attachFileName(m.getOriginalFilename())
                 .fileSize(m.getSize())
                 .fileType(m.getContentType())
+                .thumbnail(isThumbnail)
                 .attachFilePath(path.toString())
                 .build();
     }

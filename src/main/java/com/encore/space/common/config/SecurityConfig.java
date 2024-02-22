@@ -68,6 +68,8 @@ public class SecurityConfig {
                                 .requestMatchers(SwaggerUrl).permitAll()
                                 .requestMatchers(MemberApiUrl).permitAll()
                                 .requestMatchers(LoginApiUrl).permitAll()
+                                .requestMatchers(PostApiUrl).permitAll()
+                                .requestMatchers(FileResource).permitAll()
                                 .requestMatchers(ManagerApiUrl).hasAnyRole("MANAGER")
                                 .anyRequest()
                                 .authenticated()
@@ -117,8 +119,17 @@ public class SecurityConfig {
             "/login",
     };
 
+    private static final String[] PostApiUrl = {
+            "/api/post/list",
+    };
+
+    private static final String[] FileResource = {
+            "/static/**",
+    };
+
     private static final String[] ManagerApiUrl = {
             "/manager/**",
     };
+
 
 }
