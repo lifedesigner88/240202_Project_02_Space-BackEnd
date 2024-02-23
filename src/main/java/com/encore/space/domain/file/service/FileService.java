@@ -8,11 +8,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,13 +39,13 @@ public class FileService {
     public void setThumbnail(MultipartFile thumbnail,Post post){
         UUID uuid = UUID.randomUUID();
         String thumbnailFileName = uuid + "_thumbnail_" + thumbnail.getOriginalFilename();
-        Path thumbnailPath = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", thumbnailFileName);
+        Path thumbnailPath = Paths.get(System.getProperty("user.dir") + "/src/main/java/com/encore/space/images", thumbnailFileName);
         try {
             byte[] bytes = thumbnail.getBytes();
             Files.write(thumbnailPath, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
             String isThumbnail="Y";
-            fileRepository.save(changeType.toAttachFile(thumbnail,post,"http://localhost:8080/images/"+thumbnailFileName, isThumbnail));
-            post.setThumbnail("http://localhost:8080/images/"+thumbnailFileName);
+            AttachFile attachFile = fileRepository.save(changeType.toAttachFile(thumbnail,post, thumbnailPath.toString(), isThumbnail));
+            post.setThumbnail(attachFile.getId().toString());
         } catch (IOException e) {
             throw new IllegalArgumentException("image not available");
         }
@@ -67,12 +69,13 @@ public class FileService {
                 if(!Objects.requireNonNull(attachFileList.get(i).getOriginalFilename()).isEmpty()){
                     UUID uuid = UUID.randomUUID();
                     String attachFileName = uuid + "_" + attachFileList.get(i).getOriginalFilename();
-                    Path path = Paths.get(System.getProperty("user.dir") + "/src/main/resources/static/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
+                    Path path = Paths.get(System.getProperty("user.dir") + "/src/main/java/com/encore/space/images", attachFileName);        //게시판 ID 값 뒤에 붙여보기
                     String isThumbnail="N";
                     byte[] bytes = attachFileList.get(i).getBytes();
                     Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-                    post.setContents(post.getContents().replace(imgUrlList.get(0),"http://localhost:8080/images/"+ attachFileName));
-                    fileRepository.save(changeType.toAttachFile(attachFileList.get(i),post,"http://localhost:8080/images/"+attachFileName ,isThumbnail));
+                    AttachFile attachFile = fileRepository.save(changeType.toAttachFile(attachFileList.get(i),post,System.getProperty("user.dir") + "/src/main/java/com/encore/space/images/"+ attachFileName ,isThumbnail));
+                    post.setContents(post.getContents().replace("src=", ":src=").replace(imgUrlList.get(0),"http://localhost:8080//api/file/images/"+attachFile.getId()+"/image"));
+
                 }
             } catch (IOException e) {
                 throw new IllegalArgumentException("file not available");
@@ -117,6 +120,18 @@ public class FileService {
     // 파일 경로로 파일 가져오는 함수
     public AttachFile findByFilePath(String path){
         return fileRepository.findByAttachFilePath(path);
+    }
 
+    public Resource getImage(Long id) {
+        AttachFile item = this.findById(id);
+        String imagePath = item.getAttachFilePath();
+        Resource resource;
+        Path path = Paths.get(imagePath);
+        try {
+            resource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("url error");
+        }
+        return resource;
     }
 }
