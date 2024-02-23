@@ -31,8 +31,11 @@ public class AttachFile extends BaseEntity {
     private Long fileSize;
     @Builder.Default
     private String delYN = "N";
+
+    private String thumbnail;
+
     @Builder.Default
-    private String thumbnail="N";
+    private String thumbnailYn="N";
 
     public void delete(){
         this.delYN="Y";
