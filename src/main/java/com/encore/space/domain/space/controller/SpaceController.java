@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "스페이스 관련 API")
+@Tag(name = "회원관련 API")
 @RestController
 @RequestMapping("space")
 public class SpaceController {

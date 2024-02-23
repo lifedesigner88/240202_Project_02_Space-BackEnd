@@ -143,7 +143,7 @@ public class ChangeType {
 
     public AttachFile toAttachFile(MultipartFile m,
                                    Post post,
-                                   Path path,
+                                   String thumbnailFileName,
                                    String isThumbnail){
         return AttachFile.builder()
                 .post(post)
@@ -151,7 +151,7 @@ public class ChangeType {
                 .fileSize(m.getSize())
                 .fileType(m.getContentType())
                 .thumbnail(isThumbnail)
-                .attachFilePath(path.toString())
+                .attachFilePath(thumbnailFileName)
                 .build();
     }
 
