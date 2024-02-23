@@ -66,6 +66,18 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
                 .body(fileService.downloadFile(attachFile));
     }
+
+    @Operation(
+            summary = "src 이미지 경로",
+            description = "이미지 로드"
+    )
+    @GetMapping("/images/{id}/image")
+    public ResponseEntity<Resource> getItem(@PathVariable Long id){
+        Resource resource = fileService.getImage(id);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(resource, httpHeaders, HttpStatus.OK);
+    }
 }
 
 
