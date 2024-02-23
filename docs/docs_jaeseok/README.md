@@ -30,7 +30,7 @@
 - 웹소켓은 연결을 수립하기 위해서 Upgrade헤더와 Connection헤더를 포함하는 HTTP요청을 최초에 보낸다.
 
 <p align="center">
-    <img src="/docs/chat/img/01websocket.png"/>
+    <img src="/docs/docs_jaeseok/img/01websocket.png"/>
 </p>
 
 - 상태코드: `101 Switching Protocols` 
@@ -56,7 +56,7 @@
 ## 3. 스프링 환경에서 웹소켓 사용하기
 
 <p align="center">
-  <img src="/docs/chat/img/02_STOMP_logo.png"/>
+  <img src="/docs/docs_jaeseok/img/02_STOMP_logo.png"/>
 </p>
 
 - 앞에서 설명한 웹소켓만을 사용해서 채팅을 구현하게 되면 고려해야 할 사항이 많아진다.
@@ -87,7 +87,7 @@ Body^@
 ### 3.2. Publish / Subscribe
 
 <p align="center">
-  <img src="/docs/chat/img/03_pubsub.png"/>
+  <img src="/docs/docs_jaeseok/img/03_pubsub.png"/>
 </p>
 
 - 2명의 사용자 클라이언트가 있고, 사용자는 서버와 웹소켓으로 연결
@@ -95,14 +95,14 @@ Body^@
 - **발행자**의 메시지 타겟을 `no01`으로 설정해서 메시지를 보내고, 서버에서는 발행자의 메시지를 확인한 후 `no01` 채널을 구독하는 모든 사용자에게 메시지를 보내게 됨.
 
 <p align="center">
-  <img src="/docs/chat/img/04_pubsub.png"/>
+  <img src="/docs/docs_jaeseok/img/04_pubsub.png"/>
 </p>
 
 - 구독 URL이 다르다면?
 - 발행자가 메시지 타겟을 `no01`로 설정해서 메시지를 보냈을 때 `no02`를 구독 중인 사용자는 해당 메시지를 받지 못한다.
 
 <p align="center">
-  <img src="/docs/chat/img/05_pubsub.png"/>
+  <img src="/docs/docs_jaeseok/img/05_pubsub.png"/>
 </p>
 
 - 한편 구독과 발행을 동시에 하는 것도 가능(e.g., 채팅)
