@@ -74,7 +74,7 @@ public class FileService {
                     byte[] bytes = attachFileList.get(i).getBytes();
                     Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
                     AttachFile attachFile = fileRepository.save(changeType.toAttachFile(attachFileList.get(i),post,System.getProperty("user.dir") + "/src/main/java/com/encore/space/images/"+ attachFileName ,isThumbnail));
-                    post.setContents(post.getContents().replace("src=", ":src=").replace(imgUrlList.get(0),"http://localhost:8080//api/file/images/"+attachFile.getId()+"/image"));
+                    post.setContents(post.getContents().replaceAll(imgUrlList.get(0),"http://localhost:8080/api/file/images/"+attachFile.getId()+"/image"));
 
                 }
             } catch (IOException e) {

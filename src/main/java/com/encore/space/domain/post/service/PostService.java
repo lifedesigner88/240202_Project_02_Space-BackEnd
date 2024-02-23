@@ -89,9 +89,7 @@ public class PostService {
         Post post = this.findByPostId(postId);
         Long postHearts = heartService.postHearts(postId);
         int commentCounts= commentRepository.findAllByPostId(postId).size();
-        AttachFile thumbnail= fileService.findByFilePath(post.getThumbnail());
-        String thumbnailPath= thumbnail.getAttachFileName();
-        return changeType.postTOPostDetailResDto(post, thumbnailPath, postHearts, commentCounts);
+        return changeType.postTOPostDetailResDto(post, postHearts, commentCounts);
     }
 
     //게시글 목록 조회
