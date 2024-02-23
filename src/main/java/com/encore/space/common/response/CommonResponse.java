@@ -1,6 +1,15 @@
 package com.encore.space.common.response;
 
+import com.encore.space.domain.chat.dto.*;
+import com.encore.space.domain.comment.dto.CommentChildrenListDto;
+import com.encore.space.domain.comment.dto.CommentCreateDto;
+import com.encore.space.domain.comment.dto.CommentResDto;
+import com.encore.space.domain.comment.dto.CommentUpdateDto;
 import com.encore.space.domain.member.dto.resdto.MemberResDto;
+import com.encore.space.domain.post.dto.PostDetailResDto;
+import com.encore.space.domain.post.dto.PostListDto;
+import com.encore.space.domain.schedule.dto.resdto.CreateScheduleResDto;
+import com.encore.space.domain.space.dto.resdto.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +30,26 @@ public class CommonResponse {
 
     @Schema(description = "반환 오브젝트", anyOf = {
             String.class,
-            MemberResDto.class
+            MemberResDto.class,
+            ChatResDto.class,
+            ChatRoomCreateDto.class,
+            ChatRoomDetailDto.class,
+            ChatRoomSearchDto.class,
+            ChatRoomSubsDto.class,
+            MemberChatRoomDto.class,
+            CommentChildrenListDto.class,
+            CommentCreateDto.class,
+            CommentResDto.class,
+            CommentUpdateDto.class,
+            PostDetailResDto.class,
+            PostListDto.class,
+            CreateScheduleResDto.class,
+            CreateSpaceResDto.class,
+            GetAllSpacesResDto.class,
+            GetSpacesByEmailResDto.class,
+            MembersBySpaceResDto.class,
+            PostsBySpaceResDto.class,
+            SchedulesBySpaceResDto.class
     })
     private Object result;
 
