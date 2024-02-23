@@ -111,7 +111,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
             log.error(e.getClass().getName() + " : " + errorMessage);
 
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
             objectMapper.writeValue(
