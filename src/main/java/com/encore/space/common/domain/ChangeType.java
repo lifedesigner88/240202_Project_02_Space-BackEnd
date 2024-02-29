@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -249,6 +248,7 @@ public class ChangeType {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .contents(post.getContents())
+                .thumbnail(post.getThumbnail())
                 .build();
     }
 
