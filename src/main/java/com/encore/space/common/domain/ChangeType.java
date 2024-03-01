@@ -52,6 +52,7 @@ public class ChangeType {
                 .nickname(member.getNickname())
                 .role(member.getRole())
                 .loginType(member.getLoginType())
+                .profile(member.getProfile())
                 .build();
     }
 
@@ -59,7 +60,7 @@ public class ChangeType {
         return Member.builder()
                 .name(memberReqDto.getName())
                 .email(memberReqDto.getEmail())
-                .profile(memberReqDto.getProfile())
+                .profile(memberReqDto.getProfile() == null ? "https://picsum.photos/288" : memberReqDto.getProfile())
                 .password(memberReqDto.getPassword() == null ? null : passwordConfig.passwordEncoder().encode(memberReqDto.getPassword()))
                 .nickname(memberReqDto.getNickname())
                 .loginType(memberReqDto.getLoginType())

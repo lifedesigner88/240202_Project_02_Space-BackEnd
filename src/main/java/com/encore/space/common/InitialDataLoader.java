@@ -1,6 +1,7 @@
 package com.encore.space.common;
 
 
+import com.encore.space.domain.member.domain.LoginType;
 import com.encore.space.domain.member.domain.Member;
 import com.encore.space.domain.member.domain.Role;
 import com.encore.space.domain.member.repository.MemberRepository;
@@ -26,23 +27,27 @@ public class InitialDataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if(memberRepository.findByEmail("encorespace@gmail.com").isEmpty()){
             Member member = Member.builder()
-                    .name("SpaceManager")
+                    .name("설현")
                     .email("encorespace@gmail.com")
                     .nickname("설현매니저")
                     .password(passwordEncoder.encode("e123456789"))
                     .role(Role.MANAGER)
                     .delYn("N")
+                    .loginType(LoginType.EMAIL)
+                    .profile("https://picsum.photos/288")
                     .build();
             memberRepository.save(member);
         }
         if(memberRepository.findByEmail("ksg3941234@gmail.com").isEmpty()){
             Member member = Member.builder()
-                    .name("SpaceTeacher")
+                    .name("김선국")
                     .email("ksg3941234@gmail.com")
-                    .nickname("김선국 강사님")
+                    .nickname("한화 3기 강사님")
                     .password(passwordEncoder.encode("e123456789"))
                     .role(Role.TEACHER)
                     .delYn("N")
+                    .loginType(LoginType.EMAIL)
+                    .profile("https://picsum.photos/288")
                     .build();
             memberRepository.save(member);
         }
