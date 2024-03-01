@@ -111,7 +111,8 @@ public class SecurityConfig {
             "/api/member/create",
             "/api/member/emailAuthentication",
             "/api/member/emailCheck",
-            "/ws/**"
+            "/api/member/profile/image/**",
+            "/ws/**",
     };
 
     private static final String[] LoginApiUrl = {

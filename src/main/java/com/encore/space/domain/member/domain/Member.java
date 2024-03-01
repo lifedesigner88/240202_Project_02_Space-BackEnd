@@ -5,10 +5,7 @@ import com.encore.space.domain.chat.domain.MemberChatRoom;
 import com.encore.space.domain.post.domain.Post;
 import com.encore.space.domain.space.domain.SpaceMember;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +42,7 @@ public class Member extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private LoginType loginType;
 
+    @Setter
     private String profile;
 
     @Builder.Default
@@ -75,5 +73,8 @@ public class Member extends BaseEntity {
                 post.deletePost();
     }
 
-
+    public void updateMember(String name, String nickname) {
+        this.name = name;
+        this.nickname = nickname;
+    }
 }

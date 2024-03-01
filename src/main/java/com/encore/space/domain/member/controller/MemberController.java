@@ -16,10 +16,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -130,9 +133,9 @@ public class MemberController {
 
     @Operation(
             summary = "DelYn으로 회원 탈퇴 기능",
-            description = "탈퇴후 재 가입을 위헤 이메일에 "+"id*"+" 를 추가할 예정"
+            description = "탈퇴후 반복 재 가입을 위헤 이메일에 "+"id*_Deleted_"+" 를 추가"
     )
-    @GetMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<CommonResponse> deleteMemberUseingDelYn() {
         return CommonResponse.responseMessage(
                 HttpStatus.OK,
@@ -140,10 +143,39 @@ public class MemberController {
                 memberService.deleteMemberUseingDelYn());
     }
 
+    @Operation(
+            summary = "회원 이름과 닉네임 변경",
+            description = "이름과 닉네임을 수정"
+    )
+    @PatchMapping("/patch")
+    public ResponseEntity<CommonResponse> patchMemberInfo(@RequestBody MemberReqDto memberReqDto) {
+        return CommonResponse.responseMessage(
+                HttpStatus.OK,
+                "회원 정보 수정 완료",
+                memberService.patchMemberInfo(memberReqDto));
+    }
 
+    @Operation(
+            summary = "프로필 사진을 저장함",
+            description = "프로필 사진 저장"
+    )
+    @PutMapping("/profile")
+    public ResponseEntity<CommonResponse> updateProfile(@RequestParam MultipartFile profile) {
+        return CommonResponse.responseMessage(
+                HttpStatus.OK,
+                "회원 프로필 사진 수정 완료",
+                memberService.updateProfile(profile));
+    }
 
-
-
-
+    @Operation(
+            summary = "프로필 사진 출력",
+            description = "프로필 사진을 출력함"
+    )
+    @GetMapping("/profile/image/{email}")
+    public ResponseEntity<Resource> getProfileImage (@PathVariable String email){
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(memberService.getProfileImage(email));
+    }
 
 }

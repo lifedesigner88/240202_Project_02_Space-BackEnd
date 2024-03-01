@@ -13,14 +13,25 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -118,6 +129,45 @@ public class MemberService {
         member.deleteMember();
         return changeType.memberTOmemberResDto(
                 memberRepository.save(member));
+    }
+
+    public MemberResDto patchMemberInfo(MemberReqDto dto) {
+        Member member = getMemberByAuthetication();
+        member.updateMember(dto.getName(),dto.getNickname());
+        return changeType.memberTOmemberResDto(
+                memberRepository.save(member));
+    }
+
+    public MemberResDto updateProfile(MultipartFile profile) {
+        Member member = getMemberByAuthetication();
+        UUID uuid = UUID.randomUUID();
+        String profileName = uuid + member.getEmail() + "_profile_" + profile.getOriginalFilename();
+        Path profilePath = Paths.get(System.getProperty("user.dir") + "/src/main/java/com/encore/space/images/profiles", profileName);
+        try {
+            Files.write(profilePath, profile.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+            member.setProfile(profilePath.toString());
+        } catch (IOException e) {
+            throw new RuntimeException("프로필 업로드에 실패했습니다.");
+        }
+        return changeType.memberTOmemberResDto(memberRepository.save(member));
+    }
+
+    public Resource getProfileImage(String email) {
+        Member member = findByEmail(email);
+        String profilePath = member.getProfile();
+        try {
+            Path path = Paths.get(profilePath);
+            Resource resource = new UrlResource(path.toUri());
+            if (resource.exists()) {
+                return resource;
+            } else {
+                throw new FileNotFoundException("프로필 사진이 없습니다. ");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("프로필을 가지고 오는중에 오류 발생");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {
