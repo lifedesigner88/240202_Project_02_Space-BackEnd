@@ -28,4 +28,6 @@ public class MemberResDto {
     private Role role;
     @Schema(description = "로그인 타입")
     private LoginType loginType;
+    @Schema(description = "프로필 이미지")
+    private String profile;
 }

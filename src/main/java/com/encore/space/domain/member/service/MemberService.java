@@ -43,6 +43,12 @@ public class MemberService {
         this.changeType = changeType;
     }
 
+    public Member getMemberByAuthetication (){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return findByEmail(email);
+    }
+
     public Member findById (Long id) throws EntityNotFoundException {
         return memberRepository.findById(id).orElseThrow(()->new EntityNotFoundException("존재하지 않는 아이디 입니다."));
     }
@@ -98,15 +104,20 @@ public class MemberService {
     public List<MemberResDto> findAllMembers() {
         return memberRepository.findAll()
                 .stream()
+                .filter(member -> member.getDelYn().equals("N"))
                 .map(changeType::memberTOmemberResDto)
                 .collect(Collectors.toList());
     }
 
     public MemberResDto getMyInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Member member = findByEmail(email);
-        return changeType.memberTOmemberResDto(member);
+        return changeType.memberTOmemberResDto(getMemberByAuthetication());
+    }
+
+    public MemberResDto deleteMemberUseingDelYn() {
+        Member member = getMemberByAuthetication();
+        member.deleteMember();
+        return changeType.memberTOmemberResDto(
+                memberRepository.save(member));
     }
 
 //    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {

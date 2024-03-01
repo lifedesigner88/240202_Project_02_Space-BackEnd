@@ -17,8 +17,6 @@ import com.encore.space.domain.space.repository.SpaceMemberRepository;
 import com.encore.space.domain.space.repository.SpaceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -88,6 +86,7 @@ public class SpaceService {
         Space space = findSpaceBySapceId(spaceId);
         List<SpaceMember> spaceMembers = spaceMemberRepo.findBySpace(space);
         return spaceMembers.stream()
+                .filter(spaceMember -> spaceMember.getDelYn().equals("N"))
                 .map(changeType::spaceMemberTOmembersBySpaceResDto)
                 .collect(Collectors.toList());
     }
@@ -104,14 +103,13 @@ public class SpaceService {
         Space space = findSpaceBySapceId(spaceId);
         List<Post> posts = postRepo.findBySpace(space);
         return posts.stream()
+                .filter(post -> post.getDelYN().equals("N"))
                 .map(changeType::postsTOpostsBySpaceResDto)
                 .collect(Collectors.toList());
     }
 
     public List<GetSpacesByEmailResDto> getSpacesByEamil() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Member member = memberService.findByEmail(email);
+        Member member = memberService.getMemberByAuthetication();
         List<SpaceMember> spaceMembers = spaceMemberRepo.findByMember(member);
         return spaceMembers.stream()
                 .map(changeType::spaceMemberTOgetSpacesByEmailResDto)

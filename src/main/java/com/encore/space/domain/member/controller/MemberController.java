@@ -126,4 +126,24 @@ public class MemberController {
     public ResponseEntity<CommonResponse> getMyInfo() {
         return CommonResponse.responseMessage(HttpStatus.OK, "MyPage 정보", memberService.getMyInfo());
     }
+
+
+    @Operation(
+            summary = "DelYn으로 회원 탈퇴 기능",
+            description = "탈퇴후 재 가입을 위헤 이메일에 "+"id*"+" 를 추가할 예정"
+    )
+    @GetMapping("/delete")
+    public ResponseEntity<CommonResponse> deleteMemberUseingDelYn() {
+        return CommonResponse.responseMessage(
+                HttpStatus.OK,
+                "회원 탈퇴 성공",
+                memberService.deleteMemberUseingDelYn());
+    }
+
+
+
+
+
+
+
 }

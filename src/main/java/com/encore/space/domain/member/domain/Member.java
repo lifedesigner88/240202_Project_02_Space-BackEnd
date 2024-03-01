@@ -1,24 +1,19 @@
 package com.encore.space.domain.member.domain;
 
-import static jakarta.persistence.FetchType.LAZY;
-
 import com.encore.space.common.domain.BaseEntity;
 import com.encore.space.domain.chat.domain.MemberChatRoom;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import com.encore.space.domain.post.domain.Post;
+import com.encore.space.domain.space.domain.SpaceMember;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 
 @Entity
@@ -58,5 +53,27 @@ public class Member extends BaseEntity {
     @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberChatRoom> memberChatRooms = new ArrayList<>();
+
+    // 회원 삭제를 위한 연결
+    @Builder.Default
+    @OneToMany(fetch = LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+    private List<SpaceMember> spaceMembers = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(fetch = LAZY, mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+
+
+    public void deleteMember(){
+        this.delYn = "Y";
+        this.email = id + "*_Deleted_*" + this.email; // 같은이메일 재 가입시.
+        for (SpaceMember spaceMember : spaceMembers)
+            if (spaceMember.getMember().getId().equals(this.id))
+                spaceMember.setDelYn("Y");
+        for (Post post : posts)
+            if (post.getMember().getId().equals(this.id))
+                post.deletePost();
+    }
+
 
 }

@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +52,7 @@ public class ChangeType {
                 .nickname(member.getNickname())
                 .role(member.getRole())
                 .loginType(member.getLoginType())
+                .profile(member.getProfile())
                 .build();
     }
 
@@ -60,7 +60,7 @@ public class ChangeType {
         return Member.builder()
                 .name(memberReqDto.getName())
                 .email(memberReqDto.getEmail())
-                .profile(memberReqDto.getProfile())
+                .profile(memberReqDto.getProfile() == null ? "https://picsum.photos/288" : memberReqDto.getProfile())
                 .password(memberReqDto.getPassword() == null ? null : passwordConfig.passwordEncoder().encode(memberReqDto.getPassword()))
                 .nickname(memberReqDto.getNickname())
                 .loginType(memberReqDto.getLoginType())
@@ -249,6 +249,7 @@ public class ChangeType {
                 .postId(post.getId())
                 .title(post.getTitle())
                 .contents(post.getContents())
+                .thumbnail(post.getThumbnail())
                 .build();
     }
 
