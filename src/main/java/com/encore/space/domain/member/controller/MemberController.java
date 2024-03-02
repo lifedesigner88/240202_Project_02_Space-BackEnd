@@ -178,4 +178,16 @@ public class MemberController {
                 .body(memberService.getProfileImage(email));
     }
 
+    @Operation(
+            summary = "비밀번호 변경",
+            description = "비밀번호를 업데이트함"
+    )
+    @PatchMapping("/password")
+    public ResponseEntity<CommonResponse> updatePassword (@RequestBody MemberReqDto memberReqDto){
+        return CommonResponse.responseMessage(
+                HttpStatus.OK,
+                "패스워드 변경 완료",
+                memberService.updatePassword(memberReqDto.getPassword()));
+    }
+
 }

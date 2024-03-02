@@ -1,5 +1,6 @@
 package com.encore.space.domain.member.service;
 
+import com.encore.space.common.config.PasswordConfig;
 import com.encore.space.common.domain.ChangeType;
 import com.encore.space.domain.email.dto.EmailCodeReqDto;
 import com.encore.space.domain.email.dto.EmailReqDto;
@@ -42,16 +43,18 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final EmailService emailService;
     private final ChangeType changeType;
+    private final PasswordConfig passwordConfig;
 
     @Autowired
     public MemberService(
             MemberRepository memberRepository,
             EmailService emailService,
-            ChangeType changeType
+            ChangeType changeType, PasswordConfig passwordConfig
     ) {
         this.memberRepository = memberRepository;
         this.emailService = emailService;
         this.changeType = changeType;
+        this.passwordConfig = passwordConfig;
     }
 
     public Member getMemberByAuthetication (){
@@ -161,13 +164,20 @@ public class MemberService {
             if (resource.exists()) {
                 return resource;
             } else {
-                throw new FileNotFoundException("프로필 사진이 없습니다. ");
+                throw new FileNotFoundException("프로필 사진이 없습니다.");
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("프로필을 가지고 오는중에 오류 발생");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public MemberResDto updatePassword(String password) {
+        Member member = getMemberByAuthetication();
+        String encodedPass = passwordConfig.passwordEncoder().encode(password);
+        member.setPassword(encodedPass);
+        return changeType.memberTOmemberResDto(memberRepository.save(member));
     }
 
 //    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {

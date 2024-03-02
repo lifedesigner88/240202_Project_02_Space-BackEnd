@@ -34,7 +34,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     .role(Role.MANAGER)
                     .delYn("N")
                     .loginType(LoginType.EMAIL)
-                    .profile("https://picsum.photos/288")
+                    .profile("https://picsum.photos/2"+(10 + (int) (Math.random() * 90)))
                     .build();
             memberRepository.save(member);
         }
@@ -47,7 +47,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     .role(Role.TEACHER)
                     .delYn("N")
                     .loginType(LoginType.EMAIL)
-                    .profile("https://picsum.photos/288")
+                    .profile("https://picsum.photos/2"+(10 + (int) (Math.random() * 90)))
                     .build();
             memberRepository.save(member);
         }
