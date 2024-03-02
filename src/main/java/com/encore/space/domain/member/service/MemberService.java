@@ -180,7 +180,6 @@ public class MemberService {
         return changeType.memberTOmemberResDto(memberRepository.save(member));
     }
 
-
 //    public Optional<Member> getMemberWithAuthorities(@AuthenticationPrincipal CustomUserDetails userDetails) {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        if (authentication == null) {

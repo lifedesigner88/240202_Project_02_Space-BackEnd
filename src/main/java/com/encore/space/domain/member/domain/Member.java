@@ -78,5 +78,4 @@ public class Member extends BaseEntity {
         this.name = name;
         this.nickname = nickname;
     }
-
 }
