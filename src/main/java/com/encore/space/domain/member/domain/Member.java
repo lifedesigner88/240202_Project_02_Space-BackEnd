@@ -30,6 +30,7 @@ public class Member extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Setter
     private String password;
 
     @Column(nullable = false)
@@ -77,4 +78,5 @@ public class Member extends BaseEntity {
         this.name = name;
         this.nickname = nickname;
     }
+
 }
