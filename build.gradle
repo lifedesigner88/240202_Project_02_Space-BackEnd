@@ -26,9 +26,40 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // 스웨거
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // email
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // 시큐리티
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // 검사
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // JWT 관련 토큰
+    implementation "io.jsonwebtoken:jjwt-api:0.11.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.11.5"
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'redis.clients:jedis'
+
+    // oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 }
 
 tasks.named('test') {
