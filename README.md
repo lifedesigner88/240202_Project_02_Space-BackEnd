@@ -6,12 +6,12 @@
 # 프로젝트 개요 : 엔코아 부트캠프홍보를 위해 수강생들의 활동 기록을 통합하여 관리할 수 있는 서비스
 ![img_1.png](docs/Common/img/img_1.png)
 
+# ERD 다이어그램
+![img_4.png](docs/Common/img/img_4.png)
+
 
 # 요구사항 정의서(기능명세)
 ![img_3.png](docs/Common/img/img_3.png)
-
-# ERD 다이어그램
-![img_4.png](docs/Common/img/img_4.png)
 
 # 스웨거를 활용한 API설계
 <details>
