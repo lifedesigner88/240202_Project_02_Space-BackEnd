@@ -60,11 +60,3 @@
     <summary> 지라를 활용(2) </summary>
 
 ![img_14.png](docs/Common/img/img_14.png)
-
-
-# 개별 작업 발표
-
-- [SPACE](https://github.com/lifedesigner88/Space-BackEnd/tree/develop/docs/Space)
-- [POST, 댓글, 좋아요](https://github.com/lifedesigner88/Space-BackEnd/tree/develop/docs/heejun_docs)
-- [채팅서비스](https://github.com/lifedesigner88/Space-BackEnd/tree/develop/docs/docs_jaeseok)
-- [회원가입, 로그인 및 프론트엔드](https://github.com/lifedesigner88/Space-BackEnd/tree/develop/docs/docs_GyeongNam)
