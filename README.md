@@ -48,7 +48,7 @@
 
 
 # 중점기술명세
-![img_2.png](docs/Common/img/img_2.png)
+![image](https://github.com/lifedesigner88/240202_Project_02_Space-BackEnd/assets/123573918/6630ffbe-4bb2-4182-a831-7b7ed0ecb50a)
 
 
 # 프로젝트 관리(지라)
